@@ -1,64 +1,15 @@
 import { ref, computed, watch, templateRef } from "@li3/web";
 
 export default function () {
-  // ============== Application State ==============
-  const APPLETS = [
-    {
-      id: "calculator",
-      name: "Calculator",
-      icon: "🧮",
-      url: "https://www.calculator.net/",
-    },
-    {
-      id: "clock",
-      name: "World Clock",
-      icon: "🕐",
-      url: "https://www.timeanddate.com/worldclock/",
-    },
-    {
-      id: "weather",
-      name: "Weather",
-      icon: "🌤️",
-      url: "https://www.weather.gov/",
-    },
-    {
-      id: "notes",
-      name: "Notes",
-      icon: "📝",
-      url: "https://www.rapidtables.com/tools/notepad.html",
-    },
-    {
-      id: "maps",
-      name: "Maps",
-      icon: "🗺️",
-      url: "https://www.openstreetmap.org/export/embed.html",
-    },
-    {
-      id: "wikipedia",
-      name: "Wikipedia",
-      icon: "📚",
-      url: "https://en.wikipedia.org/wiki/Main_Page",
-    },
-    {
-      id: "translator",
-      name: "Translator",
-      icon: "🌐",
-      url: "https://translate.google.com/",
-    },
-    {
-      id: "timer",
-      name: "Timer",
-      icon: "⏱️",
-      url: "https://www.online-stopwatch.com/",
-    },
-  ];
-
   // Reactive state
   const canvas = templateRef("canvas");
-  const appletsContainer = templateRef("appletsContainer");
   const applets = ref(
     JSON.parse(localStorage.getItem("workspace-applets") || "[]"),
   );
+  const selectedApplet = computed(() =>
+    APPLETS.find((a) => a.id === applet.appletId),
+  );
+
   const zoom = ref(1);
   const zoomText = computed(() => `Zoom: ${Math.round(zoom.value * 100)}%`);
   const zoomSize = computed(() => zoom.value * 20);
@@ -245,34 +196,27 @@ export default function () {
     zoom.value = newZoom;
   }
 
-  function startDragApplet(appletId, e) {
-    e.stopPropagation();
-    const applet = getAppletById(appletId);
-    if (!applet) return;
-
+  function onDragStart(applet, event) {
+    const e = event.detail;
     const pos = screenToCanvas(e.clientX, e.clientY);
-    draggingApplet.value = appletId;
+    draggingApplet.value = applet.id;
     dragOffsetX.value = pos.x - applet.x;
     dragOffsetY.value = pos.y - applet.y;
-    bringToFront(appletId);
+    bringToFront(applet.id);
   }
 
-  function startResizeApplet(appletId, edge, e) {
-    e.stopPropagation();
-    const applet = getAppletById(appletId);
-
-    if (!applet) return;
-
+  function onResizeStart(applet, event) {
+    const e = event.detail;
     const pos = screenToCanvas(e.clientX, e.clientY);
-    resizingApplet.value = appletId;
-    resizeEdge.value = edge;
+    resizingApplet.value = applet.id;
+    resizeEdge.value = e.edge;
     resizeStartX.value = pos.x;
     resizeStartY.value = pos.y;
     resizeStartWidth.value = applet.width;
     resizeStartHeight.value = applet.height;
     resizeAppletX.value = applet.x;
     resizeAppletY.value = applet.y;
-    bringToFront(appletId);
+    bringToFront(applet.id);
   }
 
   function selectApplet(instanceId, selectedAppletId) {
@@ -380,6 +324,8 @@ export default function () {
     handleMouseMove,
     handleMouseUp,
     handleWheel,
+    onDragStart,
+    onResizeStart,
     APPLETS,
     applets,
     toolbarCollapsed,
@@ -387,5 +333,6 @@ export default function () {
     zoomSize,
     zoomText,
     drawPreviewCoords,
+    selectedApplet,
   };
 }

@@ -4,105 +4,129 @@
     bind-style="`left: ${applet.x}px; top: ${applet.y}px; width: ${applet.width}px; height: ${applet.height}px; z-index: ${applet.zIndex || 1};`";
     class="absolute rounded-lg border-2 border-zinc-600 bg-zinc-800 shadow-xl overflow-hidden flex flex-col"
     class-ring-2.ring-blue-500="active">
-  <template for="e of edges">
-    <div bind-class-name="e.cls"></div>
-  </template>
+    <template for="e of edges">
+      <div bind-class="e.cls" on-mousedown.stop="onResize({ clientX: $event.clientX, clientY: $event.clientY, edge: e.edge })"></div>
+    </template>
+    <div class="flex items-center justify-between bg-zinc-700 px-3 py-2 shrink-0 cursor-move select-none" on-mousedown.stop="onDragStart({ clientX: $event.clientX, clientY: $event.clientY })">
+      <!-- content -->
+      <span class="text-sm text-white truncate pointer-events-none">
+        {{ !applet && 'Select an Applet' || '' }}
+        {{applet?.icon}} {{applet?.name}}
+      </span>
+
+      <button class="ml-2 text-zinc-400 hover:text-red-400 transition-colors text-lg leading-none" on-mousedown.stop="" on-click="onDelete()">&times;</button>
+    </div>
+    <div class="flex-1 overflow-hidden">
+      <!-- content -->
+      <template if="!applet.appletId"></template>
+       <div class="h-full overflow-auto p-3 bg-zinc-900/50">
+        <div class="grid grid-cols-4 gap-2">
+          <template for="app of APPLETS">
+            <button
+              class="flex flex-col items-center gap-1.5 p-2 rounded-lg hover:bg-zinc-700/50 transition-colors group"
+              on-click="onSelect(app.id)">
+              <span class="text-2xl group-hover:scale-110 transition-transform">{{app.icon}}</span>
+              <span class="text-xs text-zinc-300 text-center leading-tight truncate w-full">{{app.name}}</span>
+            </button>
+          </template>
+        </div>
+       </div>
+       <template if="applet.appletId">
+        <iframe
+          class="w-full h-full border-0"
+          bind-src="applet.url";
+          bind-title="applet.name"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+        </template>
+    </div>
   </div>
   <script setup>
-    import { ref, computed, defineProp } from '@li3/web';
+    import { ref, computed, defineProp, defineEvent } from '@li3/web';
+
+    const APPLETS = [
+    {
+      id: "calculator",
+      name: "Calculator",
+      icon: "🧮",
+      url: "https://www.calculator.net/",
+    },
+    {
+      id: "clock",
+      name: "World Clock",
+      icon: "🕐",
+      url: "https://www.timeanddate.com/worldclock/",
+    },
+    {
+      id: "weather",
+      name: "Weather",
+      icon: "🌤️",
+      url: "https://www.weather.gov/",
+    },
+    {
+      id: "notes",
+      name: "Notes",
+      icon: "📝",
+      url: "https://www.rapidtables.com/tools/notepad.html",
+    },
+    {
+      id: "maps",
+      name: "Maps",
+      icon: "🗺️",
+      url: "https://www.openstreetmap.org/export/embed.html",
+    },
+    {
+      id: "wikipedia",
+      name: "Wikipedia",
+      icon: "📚",
+      url: "https://en.wikipedia.org/wiki/Main_Page",
+    },
+    {
+      id: "translator",
+      name: "Translator",
+      icon: "🌐",
+      url: "https://translate.google.com/",
+    },
+    {
+      id: "timer",
+      name: "Timer",
+      icon: "⏱️",
+      url: "https://www.online-stopwatch.com/",
+    },
+  ];
+
+    const edges = [
+      { cls: "absolute top-0 left-2 right-2 h-1 cursor-n-resize hover:bg-blue-500/50", edge: "n" },
+      { cls: "absolute bottom-0 left-2 right-2 h-1 cursor-s-resize hover:bg-blue-500/50", edge: "s" },
+      { cls: "absolute left-0 top-2 bottom-2 w-1 cursor-w-resize hover:bg-blue-500/50", edge: "w" },
+      { cls: "absolute right-0 top-2 bottom-2 w-1 cursor-e-resize hover:bg-blue-500/50", edge: "e" },
+      { cls: "absolute top-0 left-0 w-2 h-2 cursor-nw-resize hover:bg-blue-500/50", edge: "nw" },
+      { cls: "absolute top-0 right-0 w-2 h-2 cursor-ne-resize hover:bg-blue-500/50", edge: "ne" },
+      { cls: "absolute bottom-0 left-0 w-2 h-2 cursor-sw-resize hover:bg-blue-500/50", edge: "sw" },
+      { cls: "absolute bottom-0 right-0 w-2 h-2 cursor-se-resize hover:bg-blue-500/50", edge: "se" },
+    ];
 
     export default function () {
+      const applet = defineProp('applet');
       const active = defineProp('active');
-
-      const edges = [
-        { cls: "absolute top-0 left-2 right-2 h-1 cursor-n-resize hover:bg-blue-500/50", edge: "n" },
-        { cls: "absolute bottom-0 left-2 right-2 h-1 cursor-s-resize hover:bg-blue-500/50", edge: "s" },
-        { cls: "absolute left-0 top-2 bottom-2 w-1 cursor-w-resize hover:bg-blue-500/50", edge: "w" },
-        { cls: "absolute right-0 top-2 bottom-2 w-1 cursor-e-resize hover:bg-blue-500/50", edge: "e" },
-        { cls: "absolute top-0 left-0 w-2 h-2 cursor-nw-resize hover:bg-blue-500/50", edge: "nw" },
-        { cls: "absolute top-0 right-0 w-2 h-2 cursor-ne-resize hover:bg-blue-500/50", edge: "ne" },
-        { cls: "absolute bottom-0 left-0 w-2 h-2 cursor-sw-resize hover:bg-blue-500/50", edge: "sw" },
-        { cls: "absolute bottom-0 right-0 w-2 h-2 cursor-se-resize hover:bg-blue-500/50", edge: "se" },
-      ];
+      const onResize = defineEvent('resize');
+      const onDragStart = defineEvent('drag');
+      const onDelete = defineEvent('delete');
+      const onSelect = defineEvent('select');
 
       return {
         edges,
+        APPLETS,
+        onResize,
+        onDragStart,
+        onDelete,
       }
     }
   </script>
-
-  const selectedApplet = APPLETS.find(a => a.id === applet.appletId);
-      div.style.cssText = div.onmousedown = (e) => e.stopPropagation();
-
-      // Resize handles
-
-      edges.forEach(({ cls, edge }) => {
-        const handle = document.createElement("div");
-        handle.className = cls;
-        handle.onmousedown = (e) => startResizeApplet(applet.id, edge, e);
-        div.appendChild(handle);
-      });
-
-      // Header
-      const header = document.createElement("div");
-      header.className = "flex items-center justify-between bg-zinc-700 px-3 py-2 shrink-0 cursor-move select-none";
-      header.onmousedown = (e) => startDragApplet(applet.id, e);
-
-      const title = document.createElement("span");
-      title.className = "text-sm text-white truncate pointer-events-none";
-      title.textContent = selectedApplet ? `${selectedApplet.icon} ${selectedApplet.name}` : "Select an Applet";
-      header.appendChild(title);
-
-      const closeBtn = document.createElement("button");
-      closeBtn.className = "ml-2 text-zinc-400 hover:text-red-400 transition-colors text-lg leading-none";
-      closeBtn.textContent = "×";
-      closeBtn.title = "Delete applet";
-      closeBtn.onclick = () => deleteApplet(applet.id);
-      closeBtn.onmousedown = (e) => e.stopPropagation();
-      header.appendChild(closeBtn);
-
-      div.appendChild(header);
-
       // Content
-      const content = document.createElement("div");
-      content.className = "flex-1 overflow-hidden";
-
       if (!applet.appletId) {
-        // Applet selector grid
-        const selector = document.createElement("div");
-        selector.className = "h-full overflow-auto p-3 bg-zinc-900/50";
-
-        const grid = document.createElement("div");
-        grid.className = "grid grid-cols-4 gap-2";
-
-        APPLETS.forEach(app => {
-          const btn = document.createElement("button");
-          btn.className = "flex flex-col items-center gap-1.5 p-2 rounded-lg hover:bg-zinc-700/50 transition-colors group";
-          btn.onclick = () => selectApplet(applet.id, app.id);
-
-          const icon = document.createElement("span");
-          icon.className = "text-2xl group-hover:scale-110 transition-transform";
-          icon.textContent = app.icon;
-          btn.appendChild(icon);
-
-          const name = document.createElement("span");
-          name.className = "text-xs text-zinc-300 text-center leading-tight truncate w-full";
-          name.textContent = app.name;
-          btn.appendChild(name);
-
-          grid.appendChild(btn);
-        });
-
-        selector.appendChild(grid);
-        content.appendChild(selector);
       } else if (selectedApplet) {
         // Iframe
-        const iframe = document.createElement("iframe");
-        iframe.src = selectedApplet.url;
-        iframe.className = "w-full h-full border-0";
-        iframe.title = selectedApplet.name;
-        iframe.setAttribute("sandbox", "allow-scripts allow-same-origin allow-forms allow-popups");
-        content.appendChild(iframe);
+
       } else {
         const placeholder = document.createElement("div");
         placeholder.className = "flex items-center justify-center h-full text-zinc-500";

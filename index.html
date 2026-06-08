@@ -159,8 +159,10 @@
             <div ref="appletsContainer">
               <template for="applet of applets">
                 <ws-applet
-                  bind-id="applet.appletId"
-                  bind-active="draggingApplet.value === applet.id || resizingApplet.value === applet.id"
+                  bind-id="applet.id"
+                  bind-active="draggingApplet === applet.id || resizingApplet === applet.id"
+                  on-resize="onResizeStart(applet, $event)"
+                  on-drag="onDragStart(applet, $event)"
                 ></ws-applet>
               </template>
             </div>
