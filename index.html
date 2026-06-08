@@ -3,8 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AppHorde</title>
-    <link rel="stylesheet" href="https://wdn.api.apphor.de/apphorde/site.css" />
+    <title>Workspace - App Builder</title>
+    <link rel="icon" type="image/svg+xml" href="./icon.svg" />
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="component" href="/ws-applet.html" />
     <script type="importmap">
       {
         "imports": {
@@ -17,52 +19,48 @@
     </script>
   </head>
 
-  <body class="font-sans antialiased bg-zinc-900">
+  <body>
     <template app>
-      <script setup src="/index.mjs"></script>
-
       <div class="h-screen w-screen overflow-hidden bg-zinc-900 select-none">
         <!-- Toolbar -->
         <div
           class="absolute top-4 left-4 z-50 flex items-center gap-2 rounded-lg bg-zinc-800 p-2 shadow-lg"
         >
           <button
-            id="toolbar-toggle"
             class="text-zinc-400 hover:text-white transition-colors px-1"
-            title="Expand toolbar"
+            bind-title="toolbarCollapsed ? 'Expand toolbar' : 'Collapse toolbar' "
+            on-click="toggleToolbar()"
           >
-            ▶
+            {{ toolbarCollapsed ? "▶" : "◀"; }}
           </button>
           <div
-            id="toolbar-content"
-            class="flex items-center gap-2"
-            style="display: none"
+            class="items-center gap-2"
+            class-flex="!toolbarCollapsed"
+            class-none="toolbarCollapsed"
           >
-            <span id="zoom-display" class="px-2 text-sm text-zinc-400"
-              >Zoom: 100%</span
-            >
+            <span class="px-2 text-sm text-zinc-400">{{ zoomText }}</span>
             <button
-              id="reset-btn"
+              on-click="resetView()"
               class="rounded bg-zinc-700 px-3 py-1.5 text-sm text-white hover:bg-zinc-600 transition-colors"
             >
               Reset View
             </button>
             <button
-              id="show-all-btn"
+              on-click="showAllApplets()"
+              bind-disabled="!applets.length"
               class="rounded bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled=""
             >
               Show All
             </button>
             <button
-              id="tile-btn"
+              on-click="tileApplets()"
+              bind-disabled="!applets.length"
               class="rounded bg-emerald-600 px-3 py-1.5 text-sm text-white hover:bg-emerald-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled=""
             >
               Tile
             </button>
             <button
-              id="clear-btn"
+              on-click="clearAll()"
               class="rounded bg-red-600 px-3 py-1.5 text-sm text-white hover:bg-red-500 transition-colors"
             >
               Clear All
@@ -75,7 +73,7 @@
           class="absolute top-4 right-4 z-50 rounded-lg bg-zinc-800 shadow-lg"
         >
           <button
-            id="instructions-toggle"
+            on-click="toggleInstructions()"
             class="flex items-center gap-2 p-3 text-zinc-400 hover:text-white transition-colors w-full"
             title="Show instructions"
           >
@@ -89,7 +87,7 @@
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              style="transition: transform 0.2s; transform: rotate(0deg)"
+              style="transition: transform 0.2s"
             >
               <circle cx="12" cy="12" r="10"></circle>
               <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
@@ -98,12 +96,11 @@
             <span class="text-sm font-medium">Help</span>
           </button>
           <div
-            id="instructions-content"
             class="px-3 pb-3 text-xs text-zinc-400 max-w-xs"
-            style="display: none"
+            class-none="instructionsCollapsed"
           >
             <ul class="space-y-0.5">
-              <li>Click &amp; drag to draw an applet area</li>
+              <li>Click & drag to draw an applet area</li>
               <li>Ctrl/Cmd + drag to pan</li>
               <li>Scroll to zoom</li>
               <li>Min size: 100x100px</li>
@@ -115,8 +112,12 @@
 
         <!-- Canvas -->
         <div
-          id="canvas"
+          ref="canvas"
           class="h-full w-full cursor-crosshair"
+          style-background-size="`${zoomSize}px ${zoomSize}px`"
+          ;
+          style-background-position="`${panX}px ${panY}px`"
+          ;
           style="
             background-image: radial-gradient(
               circle,
@@ -126,29 +127,47 @@
             background-size: 20px 20px;
             background-position: 0px 0px;
           "
+          on-mousedown=" handleMouseDown($event)"
+          on-mousemove=" handleMouseMove($event)"
+          on-mouseup=" handleMouseUp($event)"
+          on-mouseleave=" handleMouseUp($event)"
+          on-wheel.passive="handleWheel($event)"
         >
           <!-- Transform container -->
-          <div id="transform-container" style="transform-origin: 0 0">
+          <div
+            style="transform-origin: 0 0"
+            style-transform="`translate(${panX}px, ${panY}px) scale(${zoom})`"
+          >
             <!-- Drawing preview -->
             <div
-              id="draw-preview"
+              ref="drawPreview"
               class="absolute border-2 border-dashed border-blue-500 bg-blue-500/20 rounded-lg pointer-events-none"
-              style="display: none"
+              class-none="!isDrawing"
+              style-left="`${drawPreviewCoords.x}px`"
+              style-top="`${drawPreviewCoords.y}px`"
+              style-width="`${drawPreviewCoords.width}px`"
+              style-height="`${drawPreviewCoords.height}px`"
             >
               <span
                 class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-blue-300 text-sm whitespace-nowrap"
-              ></span>
+                >{{ Math.round(drawPreviewCoords.width) }} x
+                {{Math.round(drawPreviewCoords.height)}}</span
+              >
             </div>
 
             <!-- Applets container -->
-            <div id="applets-container"></div>
+            <div ref="appletsContainer">
+              <template for="applet of applets">
+                <ws-applet
+                  bind-id="applet.appletId"
+                  bind-active="draggingApplet.value === applet.id || resizingApplet.value === applet.id"
+                ></ws-applet>
+              </template>
+            </div>
           </div>
         </div>
       </div>
-      <footer class="footer">
-        Made by <a href="https://darlanalv.es">Darlan Alves</a>.
-        <a href="https://github.com/apphorde">See more on GitHub</a>
-      </footer>
     </template>
+    <script type="module" src="./dist/app.js"></script>
   </body>
 </html>
