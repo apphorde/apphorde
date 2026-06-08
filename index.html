@@ -8,7 +8,7 @@
     <script type="importmap">
       {
         "imports": {
-          "@li3/": "https://cdn.li3.dev/@li3/"
+          "@li3/": "https://at-li3.static.apphor.de/"
         }
       }
     </script>
@@ -17,132 +17,138 @@
     </script>
   </head>
 
-  <body class="app">
-    <main class="main">
-      <template app>
-        <div class="h-screen w-screen overflow-hidden bg-zinc-900 select-none">
-          <!-- Toolbar -->
-          <div
-            class="absolute top-4 left-4 z-50 flex items-center gap-2 rounded-lg bg-zinc-800 p-2 shadow-lg"
+  <body class="font-sans antialiased bg-zinc-900">
+    <template app>
+      <script setup src="/index.mjs"></script>
+
+      <div class="h-screen w-screen overflow-hidden bg-zinc-900 select-none">
+        <!-- Toolbar -->
+        <div
+          class="absolute top-4 left-4 z-50 flex items-center gap-2 rounded-lg bg-zinc-800 p-2 shadow-lg"
+        >
+          <button
+            id="toolbar-toggle"
+            class="text-zinc-400 hover:text-white transition-colors px-1"
+            title="Expand toolbar"
           >
+            ▶
+          </button>
+          <div
+            id="toolbar-content"
+            class="flex items-center gap-2"
+            style="display: none"
+          >
+            <span id="zoom-display" class="px-2 text-sm text-zinc-400"
+              >Zoom: 100%</span
+            >
             <button
-              id="toolbar-toggle"
-              class="text-zinc-400 hover:text-white transition-colors px-1"
-              title="Collapse toolbar"
+              id="reset-btn"
+              class="rounded bg-zinc-700 px-3 py-1.5 text-sm text-white hover:bg-zinc-600 transition-colors"
             >
-              \u25C0
+              Reset View
             </button>
-            <div id="toolbar-content" class="flex items-center gap-2">
-              <span id="zoom-display" class="px-2 text-sm text-zinc-400"
-                >Zoom: 100%</span
-              >
-              <button
-                id="reset-btn"
-                class="rounded bg-zinc-700 px-3 py-1.5 text-sm text-white hover:bg-zinc-600 transition-colors"
-              >
-                Reset View
-              </button>
-              <button
-                id="show-all-btn"
-                class="rounded bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Show All
-              </button>
-              <button
-                id="tile-btn"
-                class="rounded bg-emerald-600 px-3 py-1.5 text-sm text-white hover:bg-emerald-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Tile
-              </button>
-              <button
-                id="clear-btn"
-                class="rounded bg-red-600 px-3 py-1.5 text-sm text-white hover:bg-red-500 transition-colors"
-              >
-                Clear All
-              </button>
-            </div>
-          </div>
-
-          <!-- Instructions -->
-          <div
-            class="absolute top-4 right-4 z-50 rounded-lg bg-zinc-800 shadow-lg"
-          >
             <button
-              id="instructions-toggle"
-              class="flex items-center gap-2 p-3 text-zinc-400 hover:text-white transition-colors w-full"
-              title="Show instructions"
+              id="show-all-btn"
+              class="rounded bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled=""
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                style="transition: transform 0.2s"
-              >
-                <circle cx="12" cy="12" r="10"></circle>
-                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-                <path d="M12 17h.01"></path>
-              </svg>
-              <span class="text-sm font-medium">Help</span>
+              Show All
             </button>
-            <div
-              id="instructions-content"
-              class="px-3 pb-3 text-xs text-zinc-400 max-w-xs"
-              style="display: none"
+            <button
+              id="tile-btn"
+              class="rounded bg-emerald-600 px-3 py-1.5 text-sm text-white hover:bg-emerald-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled=""
             >
-              <ul class="space-y-0.5">
-                <li>Click & drag to draw an applet area</li>
-                <li>Ctrl/Cmd + drag to pan</li>
-                <li>Scroll to zoom</li>
-                <li>Min size: 100x100px</li>
-                <li>Drag title bar to move applets</li>
-                <li>Drag edges/corners to resize</li>
-              </ul>
-            </div>
-          </div>
-
-          <!-- Canvas -->
-          <div
-            id="canvas"
-            class="h-full w-full cursor-crosshair"
-            style="
-              background-image: radial-gradient(
-                circle,
-                #3f3f46 1px,
-                transparent 1px
-              );
-              background-size: 20px 20px;
-              background-position: 0px 0px;
-            "
-          >
-            <!-- Transform container -->
-            <div id="transform-container" style="transform-origin: 0 0">
-              <!-- Drawing preview -->
-              <div
-                id="draw-preview"
-                class="absolute border-2 border-dashed border-blue-500 bg-blue-500/20 rounded-lg pointer-events-none"
-                style="display: none"
-              >
-                <span
-                  class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-blue-300 text-sm whitespace-nowrap"
-                ></span>
-              </div>
-
-              <!-- Applets container -->
-              <div id="applets-container"></div>
-            </div>
+              Tile
+            </button>
+            <button
+              id="clear-btn"
+              class="rounded bg-red-600 px-3 py-1.5 text-sm text-white hover:bg-red-500 transition-colors"
+            >
+              Clear All
+            </button>
           </div>
         </div>
-      </template>
-    </main>
-    <footer class="footer">
-      Made by <a href="https://darlanalv.es">Darlan Alves</a>.
-      <a href="https://github.com/apphorde">See more on GitHub</a>
-    </footer>
+
+        <!-- Instructions -->
+        <div
+          class="absolute top-4 right-4 z-50 rounded-lg bg-zinc-800 shadow-lg"
+        >
+          <button
+            id="instructions-toggle"
+            class="flex items-center gap-2 p-3 text-zinc-400 hover:text-white transition-colors w-full"
+            title="Show instructions"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              style="transition: transform 0.2s; transform: rotate(0deg)"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+              <path d="M12 17h.01"></path>
+            </svg>
+            <span class="text-sm font-medium">Help</span>
+          </button>
+          <div
+            id="instructions-content"
+            class="px-3 pb-3 text-xs text-zinc-400 max-w-xs"
+            style="display: none"
+          >
+            <ul class="space-y-0.5">
+              <li>Click &amp; drag to draw an applet area</li>
+              <li>Ctrl/Cmd + drag to pan</li>
+              <li>Scroll to zoom</li>
+              <li>Min size: 100x100px</li>
+              <li>Drag title bar to move applets</li>
+              <li>Drag edges/corners to resize</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Canvas -->
+        <div
+          id="canvas"
+          class="h-full w-full cursor-crosshair"
+          style="
+            background-image: radial-gradient(
+              circle,
+              #3f3f46 1px,
+              transparent 1px
+            );
+            background-size: 20px 20px;
+            background-position: 0px 0px;
+          "
+        >
+          <!-- Transform container -->
+          <div id="transform-container" style="transform-origin: 0 0">
+            <!-- Drawing preview -->
+            <div
+              id="draw-preview"
+              class="absolute border-2 border-dashed border-blue-500 bg-blue-500/20 rounded-lg pointer-events-none"
+              style="display: none"
+            >
+              <span
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-blue-300 text-sm whitespace-nowrap"
+              ></span>
+            </div>
+
+            <!-- Applets container -->
+            <div id="applets-container"></div>
+          </div>
+        </div>
+      </div>
+      <footer class="footer">
+        Made by <a href="https://darlanalv.es">Darlan Alves</a>.
+        <a href="https://github.com/apphorde">See more on GitHub</a>
+      </footer>
+    </template>
   </body>
 </html>

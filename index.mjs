@@ -1,3 +1,5 @@
+import { ref } from "@li3/web";
+
 export function getApps() {
   const apps = [
     {
@@ -57,12 +59,11 @@ export function getApps() {
   return { apps, getUrl, getIcon };
 }
 
-// Reactive state
-const applets = ref(
-  JSON.parse(localStorage.getItem("workspace-applets") || "[]"),
-);
-
 export default function () {
+  const applets = ref(
+    JSON.parse(localStorage.getItem("workspace-applets") || "[]"),
+  );
+
   const zoom = ref(1);
   const panX = ref(0);
   const panY = ref(0);
@@ -467,9 +468,8 @@ export default function () {
 }
 
 function renderApplets() {
-
   applets.value.forEach((applet) => {
-    const selectedApplet = APPLETS.find((a) => a.id === applet.appletId);
+    const selectedApplet = applets.value.find((a) => a.id === applet.appletId);
     const isActive =
       draggingApplet.value === applet.id || resizingApplet.value === applet.id;
 
@@ -557,7 +557,7 @@ function renderApplets() {
       const grid = document.createElement("div");
       grid.className = "grid grid-cols-4 gap-2";
 
-      APPLETS.forEach((app) => {
+      applets.value.forEach((app) => {
         const btn = document.createElement("button");
         btn.className =
           "flex flex-col items-center gap-1.5 p-2 rounded-lg hover:bg-zinc-700/50 transition-colors group";
