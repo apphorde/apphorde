@@ -1,117 +1,168 @@
 <template component="ws-applet">
   <div
     on-mousedown.prevent=""
-    bind-style="`left: ${applet.x}px; top: ${applet.y}px; width: ${applet.width}px; height: ${applet.height}px; z-index: ${applet.zIndex || 1};`";
+    bind-style="`left: ${applet.x}px; top: ${applet.y}px; width: ${applet.width}px; height: ${applet.height}px; z-index: ${applet.zIndex || 1};`"
     class="absolute rounded-lg border-2 border-zinc-600 bg-zinc-800 shadow-xl overflow-hidden flex flex-col"
-    class-ring-2.ring-blue-500="active">
+    class-ring-2.ring-blue-500="active"
+  >
     <template for="e of edges">
-      <div bind-class="e.cls" on-mousedown.stop="onResize({ clientX: $event.clientX, clientY: $event.clientY, edge: e.edge })"></div>
+      <div
+        bind-class="e.cls"
+        on-mousedown.stop="onResize({ clientX: $event.clientX, clientY: $event.clientY, edge: e.edge })"
+      ></div>
     </template>
-    <div class="flex items-center justify-between bg-zinc-700 px-3 py-2 shrink-0 cursor-move select-none" on-mousedown.stop="onDragStart({ clientX: $event.clientX, clientY: $event.clientY })">
+    <div
+      class="flex items-center justify-between bg-zinc-700 px-3 py-2 shrink-0 cursor-move select-none"
+      on-mousedown.stop="onDragStart({ clientX: $event.clientX, clientY: $event.clientY })"
+    >
       <!-- content -->
-      <span class="text-sm text-white truncate pointer-events-none">
-        {{ !applet && 'Select an Applet' || '' }}
-        {{applet?.icon}} {{applet?.name}}
-      </span>
+      <template if="!applet.appletId">
+        <span class="text-sm text-white truncate pointer-events-none">
+          Select an Applet
+        </span></template
+      >
+      <template if="!applet.appletId">
+        <span class="text-sm text-white truncate pointer-events-none">
+          {{applet.icon}} {{applet.name}}
+        </span>
+      </template>
 
-      <button class="ml-2 text-zinc-400 hover:text-red-400 transition-colors text-lg leading-none" on-mousedown.stop="" on-click="onDelete()">&times;</button>
+      <button
+        class="ml-2 text-zinc-400 hover:text-red-400 transition-colors text-lg leading-none"
+        on-mousedown.stop=""
+        on-click="onDelete()"
+      >
+        &times;
+      </button>
     </div>
     <div class="flex-1 overflow-hidden">
       <!-- content -->
       <template if="!applet.appletId"></template>
-       <div class="h-full overflow-auto p-3 bg-zinc-900/50">
+      <div class="h-full overflow-auto p-3 bg-zinc-900/50">
         <div class="grid grid-cols-4 gap-2">
           <template for="app of APPLETS">
             <button
               class="flex flex-col items-center gap-1.5 p-2 rounded-lg hover:bg-zinc-700/50 transition-colors group"
-              on-click="onSelect(app.id)">
-              <span class="text-2xl group-hover:scale-110 transition-transform">{{app.icon}}</span>
-              <span class="text-xs text-zinc-300 text-center leading-tight truncate w-full">{{app.name}}</span>
+              on-click="onSelect(app.id)"
+            >
+              <span class="text-2xl group-hover:scale-110 transition-transform"
+                >{{app.icon}}</span
+              >
+              <span
+                class="text-xs text-zinc-300 text-center leading-tight truncate w-full"
+                >{{app.name}}</span
+              >
             </button>
           </template>
         </div>
-       </div>
-       <template if="applet.appletId">
+      </div>
+      <template if="applet.appletId">
         <iframe
           class="w-full h-full border-0"
-          bind-src="applet.url";
+          bind-src="applet.url"
+          ;
           bind-title="applet.name"
-          sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
-        </template>
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+        ></iframe>
+      </template>
     </div>
   </div>
   <script setup>
-    import { ref, computed, defineProp, defineEvent } from '@li3/web';
+    import { ref, computed, defineProp, defineEvent } from "@li3/web";
 
     const APPLETS = [
-    {
-      id: "calculator",
-      name: "Calculator",
-      icon: "🧮",
-      url: "https://www.calculator.net/",
-    },
-    {
-      id: "clock",
-      name: "World Clock",
-      icon: "🕐",
-      url: "https://www.timeanddate.com/worldclock/",
-    },
-    {
-      id: "weather",
-      name: "Weather",
-      icon: "🌤️",
-      url: "https://www.weather.gov/",
-    },
-    {
-      id: "notes",
-      name: "Notes",
-      icon: "📝",
-      url: "https://www.rapidtables.com/tools/notepad.html",
-    },
-    {
-      id: "maps",
-      name: "Maps",
-      icon: "🗺️",
-      url: "https://www.openstreetmap.org/export/embed.html",
-    },
-    {
-      id: "wikipedia",
-      name: "Wikipedia",
-      icon: "📚",
-      url: "https://en.wikipedia.org/wiki/Main_Page",
-    },
-    {
-      id: "translator",
-      name: "Translator",
-      icon: "🌐",
-      url: "https://translate.google.com/",
-    },
-    {
-      id: "timer",
-      name: "Timer",
-      icon: "⏱️",
-      url: "https://www.online-stopwatch.com/",
-    },
-  ];
+      {
+        id: "calculator",
+        name: "Calculator",
+        icon: "🧮",
+        url: "https://www.calculator.net/",
+      },
+      {
+        id: "clock",
+        name: "World Clock",
+        icon: "🕐",
+        url: "https://www.timeanddate.com/worldclock/",
+      },
+      {
+        id: "weather",
+        name: "Weather",
+        icon: "🌤️",
+        url: "https://www.weather.gov/",
+      },
+      {
+        id: "notes",
+        name: "Notes",
+        icon: "📝",
+        url: "https://www.rapidtables.com/tools/notepad.html",
+      },
+      {
+        id: "maps",
+        name: "Maps",
+        icon: "🗺️",
+        url: "https://www.openstreetmap.org/export/embed.html",
+      },
+      {
+        id: "wikipedia",
+        name: "Wikipedia",
+        icon: "📚",
+        url: "https://en.wikipedia.org/wiki/Main_Page",
+      },
+      {
+        id: "translator",
+        name: "Translator",
+        icon: "🌐",
+        url: "https://translate.google.com/",
+      },
+      {
+        id: "timer",
+        name: "Timer",
+        icon: "⏱️",
+        url: "https://www.online-stopwatch.com/",
+      },
+    ];
 
     const edges = [
-      { cls: "absolute top-0 left-2 right-2 h-1 cursor-n-resize hover:bg-blue-500/50", edge: "n" },
-      { cls: "absolute bottom-0 left-2 right-2 h-1 cursor-s-resize hover:bg-blue-500/50", edge: "s" },
-      { cls: "absolute left-0 top-2 bottom-2 w-1 cursor-w-resize hover:bg-blue-500/50", edge: "w" },
-      { cls: "absolute right-0 top-2 bottom-2 w-1 cursor-e-resize hover:bg-blue-500/50", edge: "e" },
-      { cls: "absolute top-0 left-0 w-2 h-2 cursor-nw-resize hover:bg-blue-500/50", edge: "nw" },
-      { cls: "absolute top-0 right-0 w-2 h-2 cursor-ne-resize hover:bg-blue-500/50", edge: "ne" },
-      { cls: "absolute bottom-0 left-0 w-2 h-2 cursor-sw-resize hover:bg-blue-500/50", edge: "sw" },
-      { cls: "absolute bottom-0 right-0 w-2 h-2 cursor-se-resize hover:bg-blue-500/50", edge: "se" },
+      {
+        cls: "absolute top-0 left-2 right-2 h-1 cursor-n-resize hover:bg-blue-500/50",
+        edge: "n",
+      },
+      {
+        cls: "absolute bottom-0 left-2 right-2 h-1 cursor-s-resize hover:bg-blue-500/50",
+        edge: "s",
+      },
+      {
+        cls: "absolute left-0 top-2 bottom-2 w-1 cursor-w-resize hover:bg-blue-500/50",
+        edge: "w",
+      },
+      {
+        cls: "absolute right-0 top-2 bottom-2 w-1 cursor-e-resize hover:bg-blue-500/50",
+        edge: "e",
+      },
+      {
+        cls: "absolute top-0 left-0 w-2 h-2 cursor-nw-resize hover:bg-blue-500/50",
+        edge: "nw",
+      },
+      {
+        cls: "absolute top-0 right-0 w-2 h-2 cursor-ne-resize hover:bg-blue-500/50",
+        edge: "ne",
+      },
+      {
+        cls: "absolute bottom-0 left-0 w-2 h-2 cursor-sw-resize hover:bg-blue-500/50",
+        edge: "sw",
+      },
+      {
+        cls: "absolute bottom-0 right-0 w-2 h-2 cursor-se-resize hover:bg-blue-500/50",
+        edge: "se",
+      },
     ];
 
     export default function () {
-      const applet = defineProp('applet');
-      const active = defineProp('active');
-      const onResize = defineEvent('resize');
-      const onDragStart = defineEvent('drag');
-      const onDelete = defineEvent('delete');
-      const onSelect = defineEvent('select');
+      const applet = defineProp("applet");
+      const active = defineProp("active");
+      const onResize = defineEvent("resize");
+      const onDragStart = defineEvent("drag");
+      const onDelete = defineEvent("delete");
+      const onSelect = defineEvent("select");
 
       return {
         edges,
@@ -119,21 +170,8 @@
         onResize,
         onDragStart,
         onDelete,
-      }
+        onSelect,
+      };
     }
   </script>
-      // Content
-      if (!applet.appletId) {
-      } else if (selectedApplet) {
-        // Iframe
-
-      } else {
-        const placeholder = document.createElement("div");
-        placeholder.className = "flex items-center justify-center h-full text-zinc-500";
-        placeholder.textContent = "Loading...";
-        content.appendChild(placeholder);
-      }
-
-      div.appendChild(content);
-      container.appendChild(div);
 </template>
