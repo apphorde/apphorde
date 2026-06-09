@@ -21,6 +21,7 @@
 
   <body>
     <template app>
+      <script setup src="/index.mjs"></script>
       <div class="h-screen w-screen overflow-hidden bg-zinc-900 select-none">
         <!-- Toolbar -->
         <div
@@ -163,6 +164,8 @@
                   bind-active="draggingApplet === applet.id || resizingApplet === applet.id"
                   on-resize="onResizeStart(applet, $event)"
                   on-drag="onDragStart(applet, $event)"
+                  on-select="onSelect(applet, app)"
+                  on-delete="onDeleteApplet(applet)"
                 ></ws-applet>
               </template>
             </div>
@@ -170,6 +173,5 @@
         </div>
       </div>
     </template>
-    <script type="module" src="./dist/app.js"></script>
   </body>
 </html>

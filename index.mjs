@@ -1,13 +1,9 @@
 import { ref, computed, watch, templateRef } from "@li3/web";
 
 export default function () {
-  // Reactive state
   const canvas = templateRef("canvas");
   const applets = ref(
     JSON.parse(localStorage.getItem("workspace-applets") || "[]"),
-  );
-  const selectedApplet = computed(() =>
-    APPLETS.find((a) => a.id === applet.appletId),
   );
 
   const zoom = ref(1);
@@ -45,14 +41,12 @@ export default function () {
   const toolbarCollapsed = ref(false);
   const instructionsCollapsed = ref(true);
 
-  // Computed next z-index
   const nextZIndex = computed(() => {
     const list = applets.value;
     if (list.length === 0) return 1;
     return Math.max(...list.map((a) => a.zIndex || 0)) + 1;
   });
 
-  // Save applets to localStorage when they change
   watch(applets, (value) => {
     localStorage.setItem("workspace-applets", JSON.stringify(value));
   });
@@ -219,11 +213,11 @@ export default function () {
     bringToFront(applet.id);
   }
 
-  function selectApplet(instanceId, selectedAppletId) {
-    updateApplet(instanceId, { appletId: selectedAppletId, loaded: true });
+  function onSelectApplet(instanceId, app) {
+    updateApplet(instanceId, { appletId: app.id, loaded: true, app });
   }
 
-  function deleteApplet(instanceId) {
+  function onDeleteApplet(instanceId) {
     applets.value = applets.value.filter((a) => a.id !== instanceId);
   }
 
@@ -326,13 +320,13 @@ export default function () {
     handleWheel,
     onDragStart,
     onResizeStart,
-    APPLETS,
+    onDeleteApplet,
+    onSelectApplet,
     applets,
     toolbarCollapsed,
     instructionsCollapsed,
     zoomSize,
     zoomText,
     drawPreviewCoords,
-    selectedApplet,
   };
 }
