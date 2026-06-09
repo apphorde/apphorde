@@ -179,7 +179,7 @@ export default function () {
   function onWheel(e) {
     const delta = e.deltaY > 0 ? 0.09 : 1.01;
     const prevZoom = zoom.value;
-    const newZoom = Math.min(Math.max(prevZoom * delta, 0.01), 5);
+    const newZoom = Math.min(Math.max(prevZoom * delta, 0.10), 5);
 
     const rect = canvas.value.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
