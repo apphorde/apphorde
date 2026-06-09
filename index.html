@@ -110,26 +110,30 @@
           </div>
         </div>
 
-        <!-- Canvas -->
-        <div
-          ref="canvas"
-          class="h-full w-full cursor-crosshair"
-          style-background-size="`${zoomSize}px ${zoomSize}px`"
-          style-background-position="`${panX}px ${panY}px`"
-          style="
+        <style>
+          .canvas {
             background-image: radial-gradient(
               circle,
-              #3f3f46 1px,
+              #8f8fa5 1px,
               transparent 1px
             );
             background-size: 20px 20px;
             background-position: 0px 0px;
-          "
-          on-pointerdown=" handleMouseDown($event)"
-          on-poinyermove=" handleMouseMove($event)"
-          on-pointerup=" handleMouseUp($event)"
-          on-mouseleave=" handleMouseUp($event)"
-          on-wheel.passive="handleWheel($event)"
+          }
+        </style>
+
+        <div
+          ref="canvas"
+          class="h-full w-full cursor-crosshair canvas"
+          bind-style="{
+            'background-size': `${zoomSize}px ${zoomSize}px`,
+            'background-position': `${panX}px ${panY}px`
+          }"
+          on-pointerdown="onPointerDown($event)"
+          on-pointermove="onPointerDown($event)"
+          on-pointerup="onPointerUp($event)"
+          on-mouseleave="onPointerUp($event)"
+          on-wheel.prevent.stop="onWheel($event)"
         >
           <!-- Transform container -->
           <div

@@ -78,8 +78,7 @@ export default function () {
     updateApplet(id, { zIndex: nextZIndex.value });
   }
 
-  // ============== Event Handlers ==============
-  function handleMouseDown(e) {
+  function onPointerDown(e) {
     if (e.target !== canvas.value) return;
 
     if (e.button === 1 || e.ctrlKey || e.metaKey) {
@@ -96,7 +95,7 @@ export default function () {
     }
   }
 
-  function handleMouseMove(e) {
+  function onPointerMove(e) {
     if (isPanning.value) {
       panX.value = e.clientX - panStartX.value;
       panY.value = e.clientY - panStartY.value;
@@ -148,7 +147,7 @@ export default function () {
     }
   }
 
-  function handleMouseUp() {
+  function onPointerUp() {
     if (isDrawing.value) {
       const width = Math.abs(drawCurrentX.value - drawStartX.value);
       const height = Math.abs(drawCurrentY.value - drawStartY.value);
@@ -160,7 +159,7 @@ export default function () {
           y: Math.min(drawStartY.value, drawCurrentY.value),
           width,
           height,
-          appletId: '',
+          appletId: "",
           loaded: false,
           zIndex: nextZIndex.value,
         };
@@ -175,17 +174,12 @@ export default function () {
     resizeEdge.value = null;
   }
 
-  function handleWheel(e) {
-    e.preventDefault();
-    e.stopPropagation();
-
+  function onWheel(e) {
     const delta = e.deltaY > 0 ? 0.9 : 1.1;
     const prevZoom = zoom.value;
     const newZoom = Math.min(Math.max(prevZoom * delta, 0.1), 5);
 
-    const canvas = document.getElementById("canvas");
-    if (!canvas) return;
-    const rect = canvas.getBoundingClientRect();
+    const rect = canvas.value.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
 
@@ -318,10 +312,10 @@ export default function () {
     showAllApplets,
     tileApplets,
     clearAll,
-    handleMouseDown,
-    handleMouseMove,
-    handleMouseUp,
-    handleWheel,
+    onPointerDown,
+    onPointerMove,
+    onPointerUp,
+    onWheel,
     onDragStart,
     onResizeStart,
     onDelete,
