@@ -68,7 +68,7 @@
     </div>
   </div>
   <script setup>
-    import { ref, computed, defineProp, defineEvent } from "@li3/web";
+    import { ref, computed, defineProp, defineEvent, loadCss } from "@li3/web";
 
     const APPLETS = [
       {
@@ -157,6 +157,10 @@
     ];
 
     export default function () {
+      loadCss(
+        "https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css",
+      );
+
       const applet = defineProp("applet");
       const active = defineProp("active");
       const onResize = defineEvent("resize");

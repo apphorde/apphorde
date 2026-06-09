@@ -1,6 +1,10 @@
-import { ref, computed, watch, templateRef } from "@li3/web";
+import { ref, computed, watch, templateRef, loadCss } from "@li3/web";
 
 export default function () {
+  loadCss(
+    "https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css",
+  );
+
   const canvas = templateRef("canvas");
   const applets = ref(
     JSON.parse(localStorage.getItem("workspace-applets") || "[]"),
