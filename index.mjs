@@ -217,12 +217,12 @@ export default function () {
     bringToFront(applet.id);
   }
 
-  function onSelect(instanceId, app) {
-    updateApplet(instanceId, { appletId: app.id, loaded: true, app });
+  function onSelect(applet, app) {
+    updateApplet(applet, { appletId: app.id, loaded: true, app });
   }
 
-  function onDelete(instanceId) {
-    applets.value = applets.value.filter((a) => a.id !== instanceId);
+  function onDelete(applet) {
+    applets.value = applets.value.filter((a) => a.id !== applet.id);
   }
 
   function resetView() {
