@@ -332,5 +332,9 @@ export default function () {
     zoomSize,
     zoomText,
     drawPreviewCoords,
+    panX,
+    panY,
+    isDrawing,
+    
   };
 }
