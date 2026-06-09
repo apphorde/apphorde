@@ -14,12 +14,12 @@
     <template for="e of edges">
       <div
         bind-class="e.cls"
-        on-mousedown.stop="onResize({ clientX: $event.clientX, clientY: $event.clientY, edge: e.edge })"
+        on-pointerdown.stop="onResize({ clientX: $event.clientX, clientY: $event.clientY, edge: e.edge })"
       ></div>
     </template>
     <div
       class="flex items-center justify-between bg-zinc-700 px-3 py-2 shrink-0 cursor-move select-none"
-      on-mousedown.stop="onDragStart({ clientX: $event.clientX, clientY: $event.clientY })"
+      on-pointerdown.stop="onDragStart({ clientX: $event.clientX, clientY: $event.clientY })"
     >
       <!-- content -->
       <template if="!applet.appletId">
@@ -35,7 +35,7 @@
 
       <button
         class="ml-2 text-zinc-400 hover:text-red-400 transition-colors text-lg leading-none"
-        on-mousedown.stop=""
+        on-pointerdown.stop=""
         on-click="onDelete()"
       >
         &times;
@@ -66,7 +66,6 @@
         <iframe
           class="w-full h-full border-0"
           bind-src="applet.url"
-          ;
           bind-title="applet.name"
           sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
         ></iframe>
