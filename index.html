@@ -159,11 +159,12 @@
               <template for="applet of applets">
                 <ws-applet
                   bind-id="applet.id"
+                  bind-applet="applet"
                   bind-active="draggingApplet === applet.id || resizingApplet === applet.id"
                   on-resize="onResizeStart(applet, $event)"
                   on-drag="onDragStart(applet, $event)"
                   on-select="onSelect(applet, app)"
-                  on-delete="onDeleteApplet(applet)"
+                  on-delete="onDelete(applet)"
                 ></ws-applet>
               </template>
             </div>

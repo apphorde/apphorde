@@ -160,7 +160,7 @@ export default function () {
           y: Math.min(drawStartY.value, drawCurrentY.value),
           width,
           height,
-          appletId: null,
+          appletId: '',
           loaded: false,
           zIndex: nextZIndex.value,
         };
@@ -217,11 +217,11 @@ export default function () {
     bringToFront(applet.id);
   }
 
-  function onSelectApplet(instanceId, app) {
+  function onSelect(instanceId, app) {
     updateApplet(instanceId, { appletId: app.id, loaded: true, app });
   }
 
-  function onDeleteApplet(instanceId) {
+  function onDelete(instanceId) {
     applets.value = applets.value.filter((a) => a.id !== instanceId);
   }
 
@@ -324,17 +324,19 @@ export default function () {
     handleWheel,
     onDragStart,
     onResizeStart,
-    onDeleteApplet,
-    onSelectApplet,
+    onDelete,
+    onSelect,
     applets,
     toolbarCollapsed,
     instructionsCollapsed,
+    zoom,
     zoomSize,
     zoomText,
     drawPreviewCoords,
     panX,
     panY,
     isDrawing,
-    
+    draggingApplet,
+    resizingApplet,
   };
 }
