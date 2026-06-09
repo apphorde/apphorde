@@ -42,7 +42,7 @@ export default function () {
   const resizeStartHeight = ref(0);
   const resizeAppletX = ref(0);
   const resizeAppletY = ref(0);
-  const toolbarCollapsed = ref(false);
+  const toolbarCollapsed = ref((localStorage.getItem('toolbarCollapsed') || '') === 'true');
   const instructionsCollapsed = ref(true);
 
   const nextZIndex = computed(() => {
@@ -55,6 +55,8 @@ export default function () {
     localStorage.setItem("workspace-applets", JSON.stringify(value));
   });
 
+  watch(toolbarCollapsed, (value) => localStorage.setItem('toolbarCollapsed', value));
+
   function screenToCanvas(screenX, screenY) {
     return {
       x: (screenX - panX.value) / zoom.value,
@@ -62,12 +64,8 @@ export default function () {
     };
   }
 
-  function getAppletById(id) {
-    return applets.value.find((a) => a.id === id);
-  }
-
   function updateApplet(id, updates) {
-    const applet = getAppletById(id);
+    const applet = applets.value.find((a) => a.id === id);
 
     if (applet) {
       Object.assign(applet, updates);
@@ -85,13 +83,17 @@ export default function () {
       isPanning.value = true;
       panStartX.value = e.clientX - panX.value;
       panStartY.value = e.clientY - panY.value;
-    } else if (e.button === 0) {
+      return;
+    }
+
+    if (e.button === 0) {
       const pos = screenToCanvas(e.clientX, e.clientY);
       isDrawing.value = true;
       drawStartX.value = pos.x;
       drawStartY.value = pos.y;
       drawCurrentX.value = pos.x;
       drawCurrentY.value = pos.y;
+      return;
     }
   }
 
@@ -175,9 +177,9 @@ export default function () {
   }
 
   function onWheel(e) {
-    const delta = e.deltaY > 0 ? 0.9 : 1.1;
+    const delta = e.deltaY > 0 ? 0.09 : 1.01;
     const prevZoom = zoom.value;
-    const newZoom = Math.min(Math.max(prevZoom * delta, 0.1), 5);
+    const newZoom = Math.min(Math.max(prevZoom * delta, 0.01), 5);
 
     const rect = canvas.value.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;

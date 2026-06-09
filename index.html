@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Workspace - App Builder</title>
     <link rel="icon" type="image/svg+xml" href="./icon.svg" />
+    <link rel="component" href="https://at-lucide.static.apphor.de/lucide-icon.html" />
     <link rel="component" href="/ws-applet.html" />
     <script type="importmap">
       {
@@ -16,7 +17,6 @@
     </script>
     <script type="module">
       import "@li3/web";
-      import "@lucide/lucide-icon";
     </script>
   </head>
 
@@ -45,21 +45,21 @@
               on-click="resetView()"
               class="rounded bg-gray-200 px-3 py-1.5 text-sm hover:text-black text-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Reset View
+              <lucide-icon icon="scan-search" title="Reset View"></lucide-icon>
             </button>
             <button
               on-click="showAllApplets()"
               bind-disabled="!applets.length"
               class="rounded bg-gray-200 px-3 py-1.5 text-sm hover:text-black text-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Show All
+              <lucide-icon icon="layout-template" title="Show All"></lucide-icon>
             </button>
             <button
               on-click="tileApplets()"
               bind-disabled="!applets.length"
               class="rounded bg-gray-200 px-3 py-1.5 text-sm hover:text-black text-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Tile
+              <lucide-icon icon="layout-grid" title="Tile"></lucide-icon>
             </button>
             <button
               on-click="clearAll()"
@@ -132,9 +132,8 @@
             'background-position': `${panX}px ${panY}px`
           }"
           on-pointerdown="onPointerDown($event)"
-          on-pointermove="onPointerDown($event)"
+          on-pointermove="onPointerMove($event)"
           on-pointerup="onPointerUp($event)"
-          on-mouseleave="onPointerUp($event)"
           on-wheel.prevent.stop="onWheel($event)"
         >
           <!-- Transform container -->
