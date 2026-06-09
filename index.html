@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Workspace - App Builder</title>
     <link rel="icon" type="image/svg+xml" href="./icon.svg" />
-    <link rel="stylesheet" href="./styles.css" />
     <link rel="component" href="/ws-applet.html" />
     <script type="importmap">
       {
@@ -25,7 +24,7 @@
       <div class="h-screen w-screen overflow-hidden bg-zinc-900 select-none">
         <!-- Toolbar -->
         <div
-          class="absolute top-4 left-4 z-50 flex items-center gap-2 rounded-lg bg-zinc-800 p-2 shadow-lg"
+          class="absolute top-4 left-4 z-50 flex items-center gap-2 rounded-lg bg-zinc-800 p-2 shadow-lg bg-white"
         >
           <button
             class="text-zinc-400 hover:text-white transition-colors px-1"
@@ -37,7 +36,7 @@
           <div
             class="items-center gap-2"
             class-flex="!toolbarCollapsed"
-            class-none="toolbarCollapsed"
+            class-hidden="toolbarCollapsed"
           >
             <span class="px-2 text-sm text-zinc-400">{{ zoomText }}</span>
             <button
@@ -71,7 +70,7 @@
 
         <!-- Instructions -->
         <div
-          class="absolute top-4 right-4 z-50 rounded-lg bg-zinc-800 shadow-lg"
+          class="absolute top-4 right-4 z-50 rounded-lg bg-zinc-800 shadow-lg bg-white"
         >
           <button
             on-click="toggleInstructions()"
@@ -98,7 +97,7 @@
           </button>
           <div
             class="px-3 pb-3 text-xs text-zinc-400 max-w-xs"
-            class-none="instructionsCollapsed"
+            class-hidden="instructionsCollapsed"
           >
             <ul class="space-y-0.5">
               <li>Click & drag to draw an applet area</li>
@@ -163,7 +162,7 @@
                   bind-active="draggingApplet === applet.id || resizingApplet === applet.id"
                   on-resize="onResizeStart(applet, $event)"
                   on-drag="onDragStart(applet, $event)"
-                  on-select="onSelect(applet, app)"
+                  on-select="onSelect(applet, $event)"
                   on-delete="onDelete(applet)"
                 ></ws-applet>
               </template>
