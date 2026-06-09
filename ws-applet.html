@@ -1,8 +1,14 @@
 <template component="ws-applet">
   <div
     on-mousedown.prevent=""
-    bind-style="`left: ${applet.x}px; top: ${applet.y}px; width: ${applet.width}px; height: ${applet.height}px; z-index: ${applet.zIndex || 1};`"
-    class="absolute rounded-lg border-2 border-zinc-600 bg-zinc-800 shadow-xl overflow-hidden flex flex-col"
+    bind-style="{
+      left: `${applet.x}px`,
+      top: `${applet.y}px`,
+      width: `${applet.width}px`,
+      height: `${applet.height}px`,
+      z-index: `${applet.zIndex || 1}`
+    }"
+    class="absolute rounded-lg border-2 border-zinc-600 bg-zinc-800 shadow-xl overflow-hidden flex flex-col bg-white"
     class-ring-2.ring-blue-500="active"
   >
     <template for="e of edges">

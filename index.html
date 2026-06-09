@@ -160,9 +160,9 @@
                   bind-id="applet.id"
                   bind-applet="applet"
                   bind-active="draggingApplet === applet.id || resizingApplet === applet.id"
-                  on-resize="onResizeStart(applet, $event)"
-                  on-drag="onDragStart(applet, $event)"
-                  on-select="onSelect(applet, $event)"
+                  on-resize="onResizeStart(applet, $event.detail)"
+                  on-drag="onDragStart(applet, $event.detail)"
+                  on-select="onSelect(applet, $event.detail)"
                   on-delete="onDelete(applet)"
                 ></ws-applet>
               </template>
