@@ -190,8 +190,7 @@ export default function () {
     zoom.value = newZoom;
   }
 
-  function onDragStart(applet, event) {
-    const e = event.detail;
+  function onDragStart(applet, e) {
     const pos = screenToCanvas(e.clientX, e.clientY);
     draggingApplet.value = applet.id;
     dragOffsetX.value = pos.x - applet.x;
@@ -199,8 +198,7 @@ export default function () {
     bringToFront(applet.id);
   }
 
-  function onResizeStart(applet, event) {
-    const e = event.detail;
+  function onResizeStart(applet, e) {
     const pos = screenToCanvas(e.clientX, e.clientY);
     resizingApplet.value = applet.id;
     resizeEdge.value = e.edge;
