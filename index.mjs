@@ -69,6 +69,7 @@ export default function () {
 
     if (applet) {
       Object.assign(applet, updates);
+      applets.value = applets.value.slice();
     }
   }
 
