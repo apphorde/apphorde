@@ -1,14 +1,21 @@
+name: Publish
 on:
-  - push
+  push:
+    branches:
+      - main
 
 concurrency:
   group: ${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  build:
-    uses: cloud-cli/workflows/.github/workflows/docker-ghcr-build.yml@main
-    with:
-      baseImage: cloud-cli/node:latest
-      type: static
-      staticPath: .
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      DEPLOY_API_URL: ${{ secrets.DEPLOY_API_URL }}
+      DEPLOY_API_KEY: ${{ secrets.DEPLOY_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish
+        run: |
+          tar -cz -f - --exclude node_modules/ --exclude .git/ --exclude .github/ . | curl -sS -H 'Authorization: '$DEPLOY_API_KEY $DEPLOY_API_URL --data-binary @-

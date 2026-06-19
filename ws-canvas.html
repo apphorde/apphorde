@@ -1,0 +1,197 @@
+<template component="ws-canvas">
+  <script setup>
+    import { ref } from '@li3/web';
+    import { useStore } from '@app/store.mjs';
+
+    export default function () {
+      const { panX, panY, zoom } = useStore();
+      const zoomSize = computed(() => zoom.value * 20);
+      const isDrawing = ref(false);
+      const drawStartX = ref(0);
+      const drawStartY = ref(0);
+      const drawCurrentX = ref(0);
+      const drawCurrentY = ref(0);
+      const isPanning = ref(false);
+      const panStartX = ref(0);
+      const panStartY = ref(0);
+      const drawPreviewCoords = computed(() => {
+        const x = Math.min(drawStartX.value, drawCurrentX.value);
+        const y = Math.min(drawStartY.value, drawCurrentY.value);
+        const width = Math.abs(drawCurrentX.value - drawStartX.value);
+        const height = Math.abs(drawCurrentY.value - drawStartY.value);
+
+        return { x, y, width, height };
+      });
+
+      function onPointerDown(e) {
+        if (!e.target.classList.contains('canvas')) return;
+
+        if (e.button === 1 || e.ctrlKey || e.metaKey) {
+          isPanning.value = true;
+          panStartX.value = e.clientX - panX.value;
+          panStartY.value = e.clientY - panY.value;
+          return;
+        }
+
+        if (e.button === 0) {
+          const pos = screenToCanvas(e.clientX, e.clientY);
+          isDrawing.value = true;
+          drawStartX.value = pos.x;
+          drawStartY.value = pos.y;
+          drawCurrentX.value = pos.x;
+          drawCurrentY.value = pos.y;
+          return;
+        }
+      }
+
+      function onPointerMove(e) {
+        if (isPanning.value) {
+          panX.value = e.clientX - panStartX.value;
+          panY.value = e.clientY - panStartY.value;
+        } else if (isDrawing.value) {
+          const pos = screenToCanvas(e.clientX, e.clientY);
+          drawCurrentX.value = pos.x;
+          drawCurrentY.value = pos.y;
+        }
+        
+        /*if (draggingApplet.value) {
+          const pos = screenToCanvas(e.clientX, e.clientY);
+          updateApplet(draggingApplet.value, {
+            x: pos.x - dragOffsetX.value,
+            y: pos.y - dragOffsetY.value,
+          });
+        } else 
+        if (resizingApplet.value && resizeEdge.value) {
+          const pos = screenToCanvas(e.clientX, e.clientY);
+          const deltaX = pos.x - resizeStartX.value;
+          const deltaY = pos.y - resizeStartY.value;
+
+          let newX = resizeAppletX.value;
+          let newY = resizeAppletY.value;
+          let newWidth = resizeStartWidth.value;
+          let newHeight = resizeStartHeight.value;
+
+          const edge = resizeEdge.value;
+
+          if (edge.includes("e")) {
+            newWidth = Math.max(100, resizeStartWidth.value + deltaX);
+          }
+          if (edge.includes("w")) {
+            const widthChange = Math.min(deltaX, resizeStartWidth.value - 100);
+            newX = resizeAppletX.value + widthChange;
+            newWidth = resizeStartWidth.value - widthChange;
+          }
+          if (edge.includes("s")) {
+            newHeight = Math.max(100, resizeStartHeight.value + deltaY);
+          }
+          if (edge.includes("n")) {
+            const heightChange = Math.min(deltaY, resizeStartHeight.value - 100);
+            newY = resizeAppletY.value + heightChange;
+            newHeight = resizeStartHeight.value - heightChange;
+          }
+
+          updateApplet(resizingApplet.value, {
+            x: newX,
+            y: newY,
+            width: newWidth,
+            height: newHeight,
+          });
+        } */
+      }
+
+      function onPointerUp() {
+        if (isDrawing.value) {
+          const width = Math.abs(drawCurrentX.value - drawStartX.value);
+          const height = Math.abs(drawCurrentY.value - drawStartY.value);
+
+          if (width >= 100 && height >= 100) {
+            const newApplet = {
+              id: `applet-${Date.now()}`,
+              x: Math.min(drawStartX.value, drawCurrentX.value),
+              y: Math.min(drawStartY.value, drawCurrentY.value),
+              width,
+              height,
+              appletId: "",
+              loaded: false,
+              zIndex: nextZIndex.value,
+            };
+            applets.value = [...applets.value, newApplet];
+          }
+        }
+
+        isDrawing.value = false;
+        isPanning.value = false;
+        draggingApplet.value = null;
+        resizingApplet.value = null;
+        resizeEdge.value = null;
+      }
+
+      function onWheel(e) {
+        const delta = e.deltaY > 0 ? 0.09 : 1.01;
+        const prevZoom = zoom.value;
+        const newZoom = Math.min(Math.max(prevZoom * delta, 0.10), 5);
+
+        const rect = canvas.value.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+
+        panX.value = mouseX - ((mouseX - panX.value) / prevZoom) * newZoom;
+        panY.value = mouseY - ((mouseY - panY.value) / prevZoom) * newZoom;
+        zoom.value = newZoom;
+      }
+
+      return {
+        zoom,
+        zoomText,
+        zoomSize,
+        panX,
+        panY,
+        isDrawing,
+        drawStartX,
+        drawStartY,
+        drawCurrentX,
+        drawCurrentY,
+        isPanning,
+        panStartX,
+        panStartY,
+        drawPreviewCoords,
+      }
+    }
+  </script>
+  <style>
+    .canvas {
+      background-image: radial-gradient(circle,
+          #8f8fa5 1px,
+          transparent 1px);
+      background-size: 20px 20px;
+      background-position: 0px 0px;
+    }
+
+    .transform-origin {
+      transform-origin: 0 0;
+    }
+  </style>
+
+  <div ref="canvas" class="h-full w-full cursor-crosshair canvas" bind-style="{
+      'background-size': `${zoomSize}px ${zoomSize}px`,
+      'background-position': `${panX}px ${panY}px`
+    }" on-pointerdown="onPointerDown($event)" on-pointermove="onPointerMove($event)" on-pointerup="onPointerUp($event)"
+    on-wheel.prevent.stop="onWheel($event)">
+    <!-- Transform container -->
+    <div class="transform-origin" style-transform="`translate(${panX}px, ${panY}px) scale(${zoom})`">
+      <!-- Drawing preview -->
+      <div class="absolute border-2 border-dashed border-blue-500 bg-blue-500/20 rounded-lg pointer-events-none"
+        class-hidden="!isDrawing" bind-style="{
+          left: `${drawPreviewCoords.x}px`,
+          top: `${drawPreviewCoords.y}px`,
+          width: `${drawPreviewCoords.width}px`,
+          height: `${drawPreviewCoords.height}px`,
+        }">
+        <span
+          class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-blue-300 text-sm whitespace-nowrap">{{
+          Math.round(drawPreviewCoords.width) }} x
+          {{Math.round(drawPreviewCoords.height)}}</span>
+      </div>
+    </div>
+  </div>
+</template>

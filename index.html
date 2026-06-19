@@ -1,118 +1,92 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport"
-    content="width=device-width, initial-scale=1.0" />
-  <title>AppHorde</title>
-  <link rel="stylesheet"
-    href="https://wdn.api.apphor.de/apphorde/site.css" />
-  <script type="importmap">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Workspace - App Builder</title>
+    <link rel="icon" type="image/svg+xml" href="./icon.svg" />
+    <link rel="component" href="https://sodium.static.apphor.de/lucide-icon.html" />
+    <link rel="component" href="/ws-applet.html" />
+    <link rel="component" href="/ws-canvas.html" />
+    <link rel="component" href="/ws-toolbar.html" />
+    <script type="importmap">
       {
         "imports": {
-          "@li3/": "https://cdn.li3.dev/@li3/"
+          "@li3/": "https://at-li3.static.apphor.de/",
+          "@sodium/": "https://sodium.static.apphor.de/",
+          "@app/": "./" 
         }
       }
     </script>
-  <script type="module">import '@li3/web';</script>
-</head>
+    <script type="module">
+      import "@li3/web";
+    </script>
+  </head>
 
-<body class="app">
-  <main class="main">
-    <section class="container px-4 py-12 md:py-16">
-      <a href="https://apphor.de"
-        class="flex flex-col items-center text-center mb-12 md:mb-16">
-        <img src="/assets/icon.svg"
-          width="128"
-          height="128"
-          alt="AppHorde"
-          class="w-40 h-40 img-square" />
-        <h1 class="text-3xl font-bold sm:text-4xl md:text-5xl">App Horde</h1>
-        <p class="mt-4">Web apps built for the modern web.</p>
-      </a>
-      <template app>
-        <script setup>
-          export default function () {
-            const apps = [
-              {
-                name: 'Crontab Generator',
-                slug: 'crontab-generator',
-                icon: '/icon.svg',
-                description: 'Generate crontab expressions with a little help from AI',
-              },
-              {
-                name: 'Transcriber',
-                slug: 'transcriber',
-                icon: '/icon.svg',
-                description: 'Convert voice to text.',
-              },
-              {
-                name: 'Imaginator',
-                slug: 'imaginator',
-                icon: '/icon.svg',
-                description: 'Transform your words into stunning visuals with an AI-powered image generator.',
-              },
-              {
-                name: 'Tuya Control',
-                slug: 'tuya-control',
-                icon: '/assets/icon.svg',
-                description: 'A room controller for Tuya-powered devices.',
-              },
-              {
-                name: 'Quizzer',
-                slug: 'quizzer',
-                icon: '/assets/icon.svg',
-                description: 'A flashcards game with an API for deck creation.',
-              },
-              {
-                name: 'Pomodoro',
-                slug: 'pomodoro',
-                icon: '/assets/icon.svg',
-                description: 'Focus on your tasks with this simple timer.',
-              },
-              {
-                name: 'Todo',
-                slug: 'todo',
-                icon: '/assets/icon.svg',
-                description: 'Yet another todo list.',
-              },
-              {
-                name: 'Narrator',
-                slug: 'narrator',
-                icon: '/narrator.svg',
-                description: 'Text to voice app.',
-              },
-            ];
+  <body>
+    <template app>
+      <script setup src="/index.mjs"></script>
+      <div class="h-screen w-screen overflow-hidden bg-gray-900 select-none">
+        <ws-toolbar></ws-toolbar>
 
-            const getUrl = (app) => new URL(`https://${app.slug}.apphor.de`);
-            const getIcon = (app) => new URL(app.icon, `https://${app.slug}.apphor.de`);
+        <!-- Instructions -->
+        <div
+          class="absolute top-4 right-4 z-50 rounded-lg bg-gray-800 shadow-lg bg-white"
+        >
+          <button
+            on-click="toggleInstructions()"
+            class="flex items-center gap-2 p-3 text-gray-400 hover:text-white transition-colors w-full"
+            title="Show instructions"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              style="transition: transform 0.2s"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+              <path d="M12 17h.01"></path>
+            </svg>
+            <span class="text-sm font-medium">Help</span>
+          </button>
+          <div
+            class="px-3 pb-3 text-xs text-gray-400 max-w-xs"
+            class-hidden="instructionsCollapsed"
+          >
+            <ul class="space-y-0.5">
+              <li>Click & drag to draw an applet area</li>
+              <li>Ctrl/Cmd + drag to pan</li>
+              <li>Scroll to zoom</li>
+              <li>Min size: 100x100px</li>
+              <li>Drag title bar to move applets</li>
+              <li>Drag edges/corners to resize</li>
+            </ul>
+          </div>
+        </div>
 
-            return { apps, getUrl, getIcon };
-          }
-        </script>
+        <ws-canvas></ws-canvas>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
-          <template for="app of apps">
-            <a bind-href="getUrl(app)"
-              class="card">
-              <img bind-src="getIcon(app)"
-                bind-alt="app.name"
-                class="card__icon object-cover img-square" />
-              <div class="card__text">
-                <h3 class="card__title">{{ app.name }}</h3>
-                <p class="card_desc">{{ app.description || '' }}</p>
-              </div>
-            </a>
+        <div ref="appletsContainer" style="z-index: 2">
+          <template for="applet of applets">
+            <ws-applet
+              bind-id="applet.id"
+              bind-applet="applet"
+              bind-active="draggingApplet === applet.id || resizingApplet === applet.id"
+              on-resize="onResizeStart(applet, $event.detail)"
+              on-drag="onDragStart(applet, $event.detail)"
+              on-select="onSelect(applet, $event.detail)"
+              on-delete="onDelete(applet)"
+            ></ws-applet>
           </template>
         </div>
-      </template>
-    </section>
-  </main>
-  <footer class="footer">
-    Made by <a href="https://darlanalv.es">Darlan Alves</a>.
-    <a href="https://github.com/apphorde">See more on GitHub</a>
-  </footer>
-</body>
-
+      </div>
+    </template>
+  </body>
 </html>
