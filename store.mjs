@@ -17,6 +17,7 @@ function defineStore(name, fn) {
         view[name] = value;
       } else {
         Object.defineProperty(view, name, {
+          enumerable: true,
           get() {
             return store[name].value;
           },
