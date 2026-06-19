@@ -35,6 +35,11 @@ export default function () {
     localStorage.setItem("workspace-applets", JSON.stringify(value));
   });
 
+  function onUp() {
+    draggingApplet.value = '';
+    resizingApplet.value = '';
+  }
+
   function onDraw($event) {
     const { x, y, width, height } = $event.detail;
     const newApplet = {
@@ -239,6 +244,7 @@ export default function () {
     onResetView,
     onMove,
     onDraw,
+    onUp,
     applets,
     draggingApplet,
     resizingApplet,
