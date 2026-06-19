@@ -5,12 +5,14 @@
     <template for="e of edges">
       <div
         bind-class="e.cls"
-        on-pointerdown.stop="onResize({ clientX: $event.clientX, clientY: $event.clientY, edge: e.edge })"
+        on-pointerdown.stop="onResizeStart({ clientX: $event.clientX, clientY: $event.clientY, edge: e.edge })"
+        on-pointerup.stop="onResizeStop()"
       ></div>
     </template>
     <div
       class="flex items-center justify-between bg-gray-700 px-3 py-2 shrink-0 cursor-move select-none"
       on-pointerdown.stop="onDragStart({ clientX: $event.clientX, clientY: $event.clientY })"
+      on-pointerup.stop="onDragStop()"
     >
       <!-- content -->
       <template if="!applet.appletId">
@@ -159,16 +161,19 @@
 
       const applet = defineProp("applet");
       const active = defineProp("active");
-      const onResize = defineEvent("resize");
-      const onDragStart = defineEvent("drag");
+      const onResizeStart = defineEvent("resizestart");
+      const onResizeStop = defineEvent("resizestop");
+      const onDragStart = defineEvent("dragstart");
+      const onDragStop = defineEvent("dragstop");
       const onDelete = defineEvent("delete");
       const onSelect = defineEvent("select");
 
       return {
         edges,
         APPLETS,
-        onResize,
+        onResizeStart,
         onDragStart,
+        onDragStop,
         onDelete,
         onSelect,
       };

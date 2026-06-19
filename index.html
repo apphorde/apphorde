@@ -29,7 +29,7 @@
       <div class="h-screen w-screen overflow-hidden bg-gray-900 select-none">
         <ws-toolbar></ws-toolbar>
 
-        <ws-canvas></ws-canvas>
+        <ws-canvas on-></ws-canvas>
 
         <div ref="appletsContainer" style="z-index: 2">
           <template for="applet of applets">
@@ -37,8 +37,10 @@
               bind-id="applet.id"
               bind-applet="applet"
               bind-active="draggingApplet === applet.id || resizingApplet === applet.id"
-              on-resize="onResizeStart(applet, $event.detail)"
-              on-drag="onDragStart(applet, $event.detail)"
+              on-resizestart="onResizeStart(applet, $event.detail)"
+              on-resizestop="onResizeStop()"
+              on-dragstart="onDragStart(applet, $event.detail)"
+              on-dragstop="onDragStop()"
               on-select="onSelect(applet, $event.detail)"
               on-delete="onDelete(applet)"
               style-zIndex="`${applet.zIndex || 1}`"

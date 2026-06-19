@@ -56,6 +56,10 @@ export default function () {
     bringToFront(applet.id);
   }
 
+  function onDragStop(){
+    draggingApplet.value = '';
+  }
+
   function onResizeStart(applet, e) {
     const pos = store.screenToCanvas(e.clientX, e.clientY);
     resizingApplet.value = applet.id;
@@ -67,6 +71,11 @@ export default function () {
     resizeAppletX.value = applet.x;
     resizeAppletY.value = applet.y;
     bringToFront(applet.id);
+  }
+
+  function onResizeStop() {
+    resizingApplet.value = '';
+    resizeEdge.value = '';
   }
 
   function onSelect(applet, app) {
@@ -158,7 +167,9 @@ export default function () {
     tileApplets,
     clearAll,
     onDragStart,
+    onDragStop,
     onResizeStart,
+    onResizeStop,
     onDelete,
     onSelect,
     onResetView,
