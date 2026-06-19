@@ -34,7 +34,7 @@
         }
 
         if (e.button === 0) {
-          const pos = screenToCanvas(e.clientX, e.clientY);
+          const pos = store.screenToCanvas(e.clientX, e.clientY);
           isDrawing.value = true;
           drawStartX.value = pos.x;
           drawStartY.value = pos.y;
@@ -49,20 +49,20 @@
           panX.value = e.clientX - panStartX.value;
           panY.value = e.clientY - panStartY.value;
         } else if (isDrawing.value) {
-          const pos = screenToCanvas(e.clientX, e.clientY);
+          const pos = store.screenToCanvas(e.clientX, e.clientY);
           drawCurrentX.value = pos.x;
           drawCurrentY.value = pos.y;
         }
         
         /*if (draggingApplet.value) {
-          const pos = screenToCanvas(e.clientX, e.clientY);
+          const pos = store.screenToCanvas(e.clientX, e.clientY);
           updateApplet(draggingApplet.value, {
             x: pos.x - dragOffsetX.value,
             y: pos.y - dragOffsetY.value,
           });
         } else 
         if (resizingApplet.value && resizeEdge.value) {
-          const pos = screenToCanvas(e.clientX, e.clientY);
+          const pos = store.screenToCanvas(e.clientX, e.clientY);
           const deltaX = pos.x - resizeStartX.value;
           const deltaY = pos.y - resizeStartY.value;
 

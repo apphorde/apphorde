@@ -35,13 +35,6 @@ export default function () {
     localStorage.setItem("workspace-applets", JSON.stringify(value));
   });
 
-  function screenToCanvas(screenX, screenY) {
-    return {
-      x: (screenX - panX.value) / zoom.value,
-      y: (screenY - panY.value) / zoom.value,
-    };
-  }
-
   function updateApplet(id, updates) {
     const applet = applets.value.find((a) => a.id === id);
 
@@ -56,7 +49,7 @@ export default function () {
   }
 
   function onDragStart(applet, e) {
-    const pos = screenToCanvas(e.clientX, e.clientY);
+    const pos = store.screenToCanvas(e.clientX, e.clientY);
     draggingApplet.value = applet.id;
     dragOffsetX.value = pos.x - applet.x;
     dragOffsetY.value = pos.y - applet.y;
@@ -64,7 +57,7 @@ export default function () {
   }
 
   function onResizeStart(applet, e) {
-    const pos = screenToCanvas(e.clientX, e.clientY);
+    const pos = store.screenToCanvas(e.clientX, e.clientY);
     resizingApplet.value = applet.id;
     resizeEdge.value = e.edge;
     resizeStartX.value = pos.x;
