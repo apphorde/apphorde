@@ -1,8 +1,10 @@
 import { ref, computed, watch, loadCss } from "@li3/web";
-import { useStore } from '@app/store.mjs';
+import useStore, { storeToRefs } from '@app/store.mjs';
 
 export default function () {
-  const { panX, panY, zoom, resetView } = useStore();
+  const store = useStore();
+  const { panX, panY, zoom } = storeToRefs(store);
+
   loadCss(
     "https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css",
   );
@@ -155,7 +157,7 @@ export default function () {
   }
 
   function onResetView() {
-    resetView();
+    store.resetView();
   }
 
   return {

@@ -54,3 +54,19 @@ export default defineStore('store', function useStore() {
     resetView,
   };
 });
+
+export function storeToRefs(store) {
+  const refs = {};
+  
+  for (const [name, value] of Object.entries(store)) {
+    if (typeof value !== 'function') {
+      Object.defineProperty(refs, name, {
+        get() {
+          return computed(() => store[name]);
+        }
+      });
+    }
+  }
+
+  return refs;
+}
