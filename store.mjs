@@ -1,8 +1,39 @@
 import { ref } from '@li3/web';
 
-let store;
+let stores = new Map;
 
-export function useStore() {
+function defineStore(name, fn) {
+  return function () {
+    if (stores.has(name)) {
+      return stores.get(name);
+    }
+
+    const store = fn();
+    const view = {};
+    const error = new Error('Store values are read-only');
+
+    for (const [name, value] of Object.entries(store)) {
+      if (typeof value === 'function') {
+        view[name] = value;
+      } else {
+        Object.defineProperties(view, name, {
+          configurable: false,
+          get() {
+            return store[name].value;
+          },
+          set() {
+            throw error;
+          }
+        });
+      }
+    }
+
+    stores.set(name, view);
+    return view;
+  }
+}
+
+export default defineStore('store', function useStore() {
   if (store) return store;
 
   const zoom = ref(1);
@@ -15,11 +46,11 @@ export function useStore() {
     zoom.value = 1;
   }
 
-  return (store = {
+  return {
     zoom,
     panX,
     panY,
 
     resetView,
-  });
-}
+  };
+});
