@@ -1,4 +1,4 @@
-import { ref, computed, watch, templateRef, loadCss } from "@li3/web";
+import { ref, computed, watch, loadCss } from "@li3/web";
 
 export default function () {
   loadCss(
