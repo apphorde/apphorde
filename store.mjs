@@ -16,7 +16,7 @@ function defineStore(name, fn) {
       if (typeof value === 'function') {
         view[name] = value;
       } else {
-        Object.defineProperties(view, name, {
+        Object.defineProperty(view, name, {
           get() {
             return store[name].value;
           },
