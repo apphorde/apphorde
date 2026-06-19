@@ -1,0 +1,83 @@
+<template>
+  <script setup>
+    import { ref, computed, onInit } from "@li3/web";
+
+    export default function () {
+      const toolbarCollapsed = ref(
+        (localStorage.getItem("toolbarCollapsed") || "") === "true",
+      );
+      
+      const instructionsCollapsed = ref(
+        (localStorage.getItem("helpCollapsed") || "") === "true",
+      );
+
+      watch(toolbarCollapsed, (value) =>
+        localStorage.setItem("toolbarCollapsed", value),
+      );
+      watch(instructionsCollapsed, (value) =>
+        localStorage.setItem("helpCollapsed", value),
+      );
+
+      function toggleToolbar() {
+        toolbarCollapsed.value = !toolbarCollapsed.value;
+      }
+
+      function toggleInstructions() {
+        instructionsCollapsed.value = !instructionsCollapsed.value;
+      }
+
+      return {
+        toolbarCollapsed,
+        instructionsCollapsed,
+        toggleInstructions,
+        toggleToolbar,
+      };
+    }
+  </script>
+  <div
+    class="absolute top-4 left-4 z-50 flex items-center gap-2 rounded-lg bg-gray-800 p-2 shadow-lg bg-white"
+  >
+    <button
+      class="text-gray-400 hover:text-black transition-colors px-1"
+      bind-title="toolbarCollapsed ? 'Expand toolbar' : 'Collapse toolbar'"
+      on-click="toggleToolbar()"
+    >
+      {{ toolbarCollapsed ? "▶" : "◀" }}
+    </button>
+    <div
+      class="items-center gap-2"
+      class-flex="!toolbarCollapsed"
+      class-hidden="toolbarCollapsed"
+    >
+      <span class="px-2 text-sm text-gray-400"
+        >Zoom: {{ Math.round(zoom * 100) }}%</span
+      >
+      <button
+        on-click="resetView()"
+        class="rounded bg-gray-200 px-3 py-1.5 text-sm hover:text-black text-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <lucide-icon icon="scan-search" title="Reset View"></lucide-icon>
+      </button>
+      <button
+        on-click="showAllApplets()"
+        bind-disabled="!applets.length"
+        class="rounded bg-gray-200 px-3 py-1.5 text-sm hover:text-black text-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <lucide-icon icon="layout-template" title="Show All"></lucide-icon>
+      </button>
+      <button
+        on-click="tileApplets()"
+        bind-disabled="!applets.length"
+        class="rounded bg-gray-200 px-3 py-1.5 text-sm hover:text-black text-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <lucide-icon icon="layout-grid" title="Tile"></lucide-icon>
+      </button>
+      <button
+        on-click="clearAll()"
+        class="rounded bg-gray-200 px-3 py-1.5 text-sm hover:text-black text-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <lucide-icon icon="copy-x"></lucide-icon>
+      </button>
+    </div>
+  </div>
+</template>

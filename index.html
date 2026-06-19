@@ -7,11 +7,14 @@
     <link rel="icon" type="image/svg+xml" href="./icon.svg" />
     <link rel="component" href="https://sodium.static.apphor.de/lucide-icon.html" />
     <link rel="component" href="/ws-applet.html" />
+    <link rel="component" href="/ws-canvas.html" />
+    <link rel="component" href="/ws-toolbar.html" />
     <script type="importmap">
       {
         "imports": {
           "@li3/": "https://at-li3.static.apphor.de/",
-          "@sodium/": "https://sodium.static.apphor.de/"
+          "@sodium/": "https://sodium.static.apphor.de/",
+          "@app/": "./" 
         }
       }
     </script>
@@ -24,51 +27,7 @@
     <template app>
       <script setup src="/index.mjs"></script>
       <div class="h-screen w-screen overflow-hidden bg-gray-900 select-none">
-        <!-- Toolbar -->
-        <div
-          class="absolute top-4 left-4 z-50 flex items-center gap-2 rounded-lg bg-gray-800 p-2 shadow-lg bg-white"
-        >
-          <button
-            class="text-gray-400 hover:text-black transition-colors px-1"
-            bind-title="toolbarCollapsed ? 'Expand toolbar' : 'Collapse toolbar'"
-            on-click="toggleToolbar()"
-          >
-            {{ toolbarCollapsed ? "▶" : "◀" }}
-          </button>
-          <div
-            class="items-center gap-2"
-            class-flex="!toolbarCollapsed"
-            class-hidden="toolbarCollapsed"
-          >
-            <span class="px-2 text-sm text-gray-400">{{ zoomText }}</span>
-            <button
-              on-click="resetView()"
-              class="rounded bg-gray-200 px-3 py-1.5 text-sm hover:text-black text-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <lucide-icon icon="scan-search" title="Reset View"></lucide-icon>
-            </button>
-            <button
-              on-click="showAllApplets()"
-              bind-disabled="!applets.length"
-              class="rounded bg-gray-200 px-3 py-1.5 text-sm hover:text-black text-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <lucide-icon icon="layout-template" title="Show All"></lucide-icon>
-            </button>
-            <button
-              on-click="tileApplets()"
-              bind-disabled="!applets.length"
-              class="rounded bg-gray-200 px-3 py-1.5 text-sm hover:text-black text-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <lucide-icon icon="layout-grid" title="Tile"></lucide-icon>
-            </button>
-            <button
-              on-click="clearAll()"
-              class="rounded bg-gray-200 px-3 py-1.5 text-sm hover:text-black text-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <lucide-icon icon="copy-x"></lucide-icon>
-            </button>
-          </div>
-        </div>
+        <ws-toolbar></ws-toolbar>
 
         <!-- Instructions -->
         <div
@@ -112,67 +71,20 @@
           </div>
         </div>
 
-        <style>
-          .canvas {
-            background-image: radial-gradient(
-              circle,
-              #8f8fa5 1px,
-              transparent 1px
-            );
-            background-size: 20px 20px;
-            background-position: 0px 0px;
-          }
-        </style>
+        <ws-canvas></ws-canvas>
 
-        <div
-          ref="canvas"
-          class="h-full w-full cursor-crosshair canvas"
-          bind-style="{
-            'background-size': `${zoomSize}px ${zoomSize}px`,
-            'background-position': `${panX}px ${panY}px`
-          }"
-          on-pointerdown="onPointerDown($event)"
-          on-pointermove="onPointerMove($event)"
-          on-pointerup="onPointerUp($event)"
-          on-wheel.prevent.stop="onWheel($event)"
-        >
-          <!-- Transform container -->
-          <div
-            style="transform-origin: 0 0"
-            style-transform="`translate(${panX}px, ${panY}px) scale(${zoom})`"
-          >
-            <!-- Drawing preview -->
-            <div
-              class="absolute border-2 border-dashed border-blue-500 bg-blue-500/20 rounded-lg pointer-events-none"
-              class-hidden="!isDrawing"
-              bind-style="{
-                left: `${drawPreviewCoords.x}px`,
-                top: `${drawPreviewCoords.y}px`,
-                width: `${drawPreviewCoords.width}px`,
-                height: `${drawPreviewCoords.height}px`,
-              }"
-            >
-              <span
-                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-blue-300 text-sm whitespace-nowrap"
-                >{{ Math.round(drawPreviewCoords.width) }} x
-                {{Math.round(drawPreviewCoords.height)}}</span
-              >
-            </div>
-
-            <div ref="appletsContainer">
-              <template for="applet of applets">
-                <ws-applet
-                  bind-id="applet.id"
-                  bind-applet="applet"
-                  bind-active="draggingApplet === applet.id || resizingApplet === applet.id"
-                  on-resize="onResizeStart(applet, $event.detail)"
-                  on-drag="onDragStart(applet, $event.detail)"
-                  on-select="onSelect(applet, $event.detail)"
-                  on-delete="onDelete(applet)"
-                ></ws-applet>
-              </template>
-            </div>
-          </div>
+        <div ref="appletsContainer" style="z-index: 2">
+          <template for="applet of applets">
+            <ws-applet
+              bind-id="applet.id"
+              bind-applet="applet"
+              bind-active="draggingApplet === applet.id || resizingApplet === applet.id"
+              on-resize="onResizeStart(applet, $event.detail)"
+              on-drag="onDragStart(applet, $event.detail)"
+              on-select="onSelect(applet, $event.detail)"
+              on-delete="onDelete(applet)"
+            ></ws-applet>
+          </template>
         </div>
       </div>
     </template>

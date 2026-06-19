@@ -5,32 +5,10 @@ export default function () {
     "https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css",
   );
 
-  const canvas = templateRef("canvas");
   const applets = ref(
     JSON.parse(localStorage.getItem("workspace-applets") || "[]"),
   );
 
-  const zoom = ref(1);
-  const zoomText = computed(() => `Zoom: ${Math.round(zoom.value * 100)}%`);
-  const zoomSize = computed(() => zoom.value * 20);
-  const panX = ref(0);
-  const panY = ref(0);
-  const isDrawing = ref(false);
-  const drawStartX = ref(0);
-  const drawStartY = ref(0);
-  const drawCurrentX = ref(0);
-  const drawCurrentY = ref(0);
-  const isPanning = ref(false);
-  const panStartX = ref(0);
-  const panStartY = ref(0);
-  const drawPreviewCoords = computed(() => {
-    const x = Math.min(drawStartX.value, drawCurrentX.value);
-    const y = Math.min(drawStartY.value, drawCurrentY.value);
-    const width = Math.abs(drawCurrentX.value - drawStartX.value);
-    const height = Math.abs(drawCurrentY.value - drawStartY.value);
-
-    return { x, y, width, height };
-  });
   const draggingApplet = ref("");
   const dragOffsetX = ref(0);
   const dragOffsetY = ref(0);
@@ -42,8 +20,6 @@ export default function () {
   const resizeStartHeight = ref(0);
   const resizeAppletX = ref(0);
   const resizeAppletY = ref(0);
-  const toolbarCollapsed = ref((localStorage.getItem('toolbarCollapsed') || '') === 'true');
-  const instructionsCollapsed = ref(true);
 
   const nextZIndex = computed(() => {
     const list = applets.value;
@@ -54,8 +30,6 @@ export default function () {
   watch(applets, (value) => {
     localStorage.setItem("workspace-applets", JSON.stringify(value));
   });
-
-  watch(toolbarCollapsed, (value) => localStorage.setItem('toolbarCollapsed', value));
 
   function screenToCanvas(screenX, screenY) {
     return {
@@ -75,120 +49,6 @@ export default function () {
 
   function bringToFront(id) {
     updateApplet(id, { zIndex: nextZIndex.value });
-  }
-
-  function onPointerDown(e) {
-    if (e.target !== canvas.value) return;
-
-    if (e.button === 1 || e.ctrlKey || e.metaKey) {
-      isPanning.value = true;
-      panStartX.value = e.clientX - panX.value;
-      panStartY.value = e.clientY - panY.value;
-      return;
-    }
-
-    if (e.button === 0) {
-      const pos = screenToCanvas(e.clientX, e.clientY);
-      isDrawing.value = true;
-      drawStartX.value = pos.x;
-      drawStartY.value = pos.y;
-      drawCurrentX.value = pos.x;
-      drawCurrentY.value = pos.y;
-      return;
-    }
-  }
-
-  function onPointerMove(e) {
-    if (isPanning.value) {
-      panX.value = e.clientX - panStartX.value;
-      panY.value = e.clientY - panStartY.value;
-    } else if (isDrawing.value) {
-      const pos = screenToCanvas(e.clientX, e.clientY);
-      drawCurrentX.value = pos.x;
-      drawCurrentY.value = pos.y;
-    } else if (draggingApplet.value) {
-      const pos = screenToCanvas(e.clientX, e.clientY);
-      updateApplet(draggingApplet.value, {
-        x: pos.x - dragOffsetX.value,
-        y: pos.y - dragOffsetY.value,
-      });
-    } else if (resizingApplet.value && resizeEdge.value) {
-      const pos = screenToCanvas(e.clientX, e.clientY);
-      const deltaX = pos.x - resizeStartX.value;
-      const deltaY = pos.y - resizeStartY.value;
-
-      let newX = resizeAppletX.value;
-      let newY = resizeAppletY.value;
-      let newWidth = resizeStartWidth.value;
-      let newHeight = resizeStartHeight.value;
-
-      const edge = resizeEdge.value;
-
-      if (edge.includes("e")) {
-        newWidth = Math.max(100, resizeStartWidth.value + deltaX);
-      }
-      if (edge.includes("w")) {
-        const widthChange = Math.min(deltaX, resizeStartWidth.value - 100);
-        newX = resizeAppletX.value + widthChange;
-        newWidth = resizeStartWidth.value - widthChange;
-      }
-      if (edge.includes("s")) {
-        newHeight = Math.max(100, resizeStartHeight.value + deltaY);
-      }
-      if (edge.includes("n")) {
-        const heightChange = Math.min(deltaY, resizeStartHeight.value - 100);
-        newY = resizeAppletY.value + heightChange;
-        newHeight = resizeStartHeight.value - heightChange;
-      }
-
-      updateApplet(resizingApplet.value, {
-        x: newX,
-        y: newY,
-        width: newWidth,
-        height: newHeight,
-      });
-    }
-  }
-
-  function onPointerUp() {
-    if (isDrawing.value) {
-      const width = Math.abs(drawCurrentX.value - drawStartX.value);
-      const height = Math.abs(drawCurrentY.value - drawStartY.value);
-
-      if (width >= 100 && height >= 100) {
-        const newApplet = {
-          id: `applet-${Date.now()}`,
-          x: Math.min(drawStartX.value, drawCurrentX.value),
-          y: Math.min(drawStartY.value, drawCurrentY.value),
-          width,
-          height,
-          appletId: "",
-          loaded: false,
-          zIndex: nextZIndex.value,
-        };
-        applets.value = [...applets.value, newApplet];
-      }
-    }
-
-    isDrawing.value = false;
-    isPanning.value = false;
-    draggingApplet.value = null;
-    resizingApplet.value = null;
-    resizeEdge.value = null;
-  }
-
-  function onWheel(e) {
-    const delta = e.deltaY > 0 ? 0.09 : 1.01;
-    const prevZoom = zoom.value;
-    const newZoom = Math.min(Math.max(prevZoom * delta, 0.10), 5);
-
-    const rect = canvas.value.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-
-    panX.value = mouseX - ((mouseX - panX.value) / prevZoom) * newZoom;
-    panY.value = mouseY - ((mouseY - panY.value) / prevZoom) * newZoom;
-    zoom.value = newZoom;
   }
 
   function onDragStart(applet, e) {
@@ -298,39 +158,16 @@ export default function () {
     }
   }
 
-  function toggleToolbar() {
-    toolbarCollapsed.value = !toolbarCollapsed.value;
-  }
-
-  function toggleInstructions() {
-    instructionsCollapsed.value = !instructionsCollapsed.value;
-  }
-
   return {
-    toggleToolbar,
-    toggleInstructions,
     resetView,
     showAllApplets,
     tileApplets,
     clearAll,
-    onPointerDown,
-    onPointerMove,
-    onPointerUp,
-    onWheel,
     onDragStart,
     onResizeStart,
     onDelete,
     onSelect,
     applets,
-    toolbarCollapsed,
-    instructionsCollapsed,
-    zoom,
-    zoomSize,
-    zoomText,
-    drawPreviewCoords,
-    panX,
-    panY,
-    isDrawing,
     draggingApplet,
     resizingApplet,
   };
