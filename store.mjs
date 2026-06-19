@@ -46,8 +46,8 @@ export default defineStore('store', function useStore() {
 
   function screenToCanvas(screenX, screenY) {
     return {
-      x: (screenX - panX.value) / zoom.value,
-      y: (screenY - panY.value) / zoom.value,
+      x: Math.floor((screenX - panX.value) / zoom.value),
+      y: Math.floor((screenY - panY.value) / zoom.value),
     };
   }
 

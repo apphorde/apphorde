@@ -143,7 +143,7 @@ export default function () {
   }
 
   function onSelect(applet, app) {
-    updateApplet(applet, { appletId: app.id, loaded: true, app });
+    updateApplet(applet.id, { appletId: app.id, loaded: true, app });
   }
 
   function onDelete(applet) {
