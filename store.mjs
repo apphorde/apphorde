@@ -1,4 +1,4 @@
-import { ref } from '@li3/web';
+import { ref, computed } from '@li3/web';
 
 let stores = new Map();
 
