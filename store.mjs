@@ -1,6 +1,6 @@
 import { ref } from '@li3/web';
 
-let stores = new Map;
+let stores = new Map();
 
 function defineStore(name, fn) {
   return function () {
@@ -17,7 +17,6 @@ function defineStore(name, fn) {
         view[name] = value;
       } else {
         Object.defineProperties(view, name, {
-          configurable: false,
           get() {
             return store[name].value;
           },
@@ -34,8 +33,6 @@ function defineStore(name, fn) {
 }
 
 export default defineStore('store', function useStore() {
-  if (store) return store;
-
   const zoom = ref(1);
   const panX = ref(0);
   const panY = ref(0);
