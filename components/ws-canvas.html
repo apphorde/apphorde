@@ -4,7 +4,8 @@
     import useStore, { storeToRefs } from '@app/store.mjs';
 
     export default function () {
-      const { panX, panY, zoom } = storeToRefs(useStore());
+      const store = useStore();
+      const { panX, panY, zoom } = storeToRefs(store);
       const onDown = defineEvent('down');
       const onUp = defineEvent('up');
       const onMove = defineEvent('move');
