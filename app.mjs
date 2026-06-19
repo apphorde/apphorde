@@ -1,5 +1,5 @@
 import { ref, computed, watch, loadCss } from "@li3/web";
-import useStore, { storeToRefs } from '@app/store.mjs';
+import useStore, { storeToRefs } from "@app/store.mjs";
 
 export default function () {
   const store = useStore();
@@ -56,8 +56,57 @@ export default function () {
     bringToFront(applet.id);
   }
 
-  function onDragStop(){
-    draggingApplet.value = '';
+  function onDragStop() {
+    draggingApplet.value = "";
+  }
+
+  function onMove(e) {
+    const { x, y } = e.detail;
+
+    if (draggingApplet.value) {
+      const pos = store.screenToCanvas(x, y);
+      updateApplet(draggingApplet.value, {
+        x: pos.x - dragOffsetX.value,
+        y: pos.y - dragOffsetY.value,
+      });
+    }
+
+    if (resizingApplet.value && resizeEdge.value) {
+      const pos = store.screenToCanvas(x, y);
+      const deltaX = pos.x - resizeStartX.value;
+      const deltaY = pos.y - resizeStartY.value;
+
+      let newX = resizeAppletX.value;
+      let newY = resizeAppletY.value;
+      let newWidth = resizeStartWidth.value;
+      let newHeight = resizeStartHeight.value;
+
+      const edge = resizeEdge.value;
+
+      if (edge.includes("e")) {
+        newWidth = Math.max(100, resizeStartWidth.value + deltaX);
+      }
+      if (edge.includes("w")) {
+        const widthChange = Math.min(deltaX, resizeStartWidth.value - 100);
+        newX = resizeAppletX.value + widthChange;
+        newWidth = resizeStartWidth.value - widthChange;
+      }
+      if (edge.includes("s")) {
+        newHeight = Math.max(100, resizeStartHeight.value + deltaY);
+      }
+      if (edge.includes("n")) {
+        const heightChange = Math.min(deltaY, resizeStartHeight.value - 100);
+        newY = resizeAppletY.value + heightChange;
+        newHeight = resizeStartHeight.value - heightChange;
+      }
+
+      updateApplet(resizingApplet.value, {
+        x: newX,
+        y: newY,
+        width: newWidth,
+        height: newHeight,
+      });
+    }
   }
 
   function onResizeStart(applet, e) {
@@ -74,8 +123,8 @@ export default function () {
   }
 
   function onResizeStop() {
-    resizingApplet.value = '';
-    resizeEdge.value = '';
+    resizingApplet.value = "";
+    resizeEdge.value = "";
   }
 
   function onSelect(applet, app) {

@@ -1,10 +1,13 @@
 <template component="ws-canvas">
   <script setup>
-    import { ref, computed } from '@li3/web';
+    import { ref, computed, defineEvent } from '@li3/web';
     import useStore, { storeToRefs } from '@app/store.mjs';
 
     export default function () {
       const { panX, panY, zoom } = storeToRefs(useStore());
+      const onDown = defineEvent('down');
+      const onUp = defineEvent('up');
+      const onMove = defineEvent('move');
       const zoomSize = computed(() => zoom.value * 20);
       const isDrawing = ref(false);
       const drawStartX = ref(0);
@@ -42,61 +45,25 @@
           drawCurrentY.value = pos.y;
           return;
         }
+
+        onDown();
       }
 
       function onPointerMove(e) {
         if (isPanning.value) {
           panX.value = e.clientX - panStartX.value;
           panY.value = e.clientY - panStartY.value;
-        } else if (isDrawing.value) {
+          return;
+        }
+       
+        if (isDrawing.value) {
           const pos = store.screenToCanvas(e.clientX, e.clientY);
           drawCurrentX.value = pos.x;
           drawCurrentY.value = pos.y;
+          return;
         }
-        
-        /*if (draggingApplet.value) {
-          const pos = store.screenToCanvas(e.clientX, e.clientY);
-          updateApplet(draggingApplet.value, {
-            x: pos.x - dragOffsetX.value,
-            y: pos.y - dragOffsetY.value,
-          });
-        } else 
-        if (resizingApplet.value && resizeEdge.value) {
-          const pos = store.screenToCanvas(e.clientX, e.clientY);
-          const deltaX = pos.x - resizeStartX.value;
-          const deltaY = pos.y - resizeStartY.value;
 
-          let newX = resizeAppletX.value;
-          let newY = resizeAppletY.value;
-          let newWidth = resizeStartWidth.value;
-          let newHeight = resizeStartHeight.value;
-
-          const edge = resizeEdge.value;
-
-          if (edge.includes("e")) {
-            newWidth = Math.max(100, resizeStartWidth.value + deltaX);
-          }
-          if (edge.includes("w")) {
-            const widthChange = Math.min(deltaX, resizeStartWidth.value - 100);
-            newX = resizeAppletX.value + widthChange;
-            newWidth = resizeStartWidth.value - widthChange;
-          }
-          if (edge.includes("s")) {
-            newHeight = Math.max(100, resizeStartHeight.value + deltaY);
-          }
-          if (edge.includes("n")) {
-            const heightChange = Math.min(deltaY, resizeStartHeight.value - 100);
-            newY = resizeAppletY.value + heightChange;
-            newHeight = resizeStartHeight.value - heightChange;
-          }
-
-          updateApplet(resizingApplet.value, {
-            x: newX,
-            y: newY,
-            width: newWidth,
-            height: newHeight,
-          });
-        } */
+        onMove({ x: e.clientX, y: e.clientY });
       }
 
       function onPointerUp() {
@@ -116,11 +83,14 @@
               zIndex: nextZIndex.value,
             };
             applets.value = [...applets.value, newApplet];
+            return;
           }
         }
 
         isDrawing.value = false;
         isPanning.value = false;
+
+        onUp();
       }
 
       function onWheel(e) {
