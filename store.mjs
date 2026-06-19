@@ -1,3 +1,5 @@
+import { ref } from '@li3/web';
+
 let store;
 
 export function useStore() {
