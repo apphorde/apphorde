@@ -18,7 +18,7 @@
       ></div>
     </template>
     <div
-      class="flex items-center justify-between bg-zinc-700 px-3 py-2 shrink-0 cursor-move select-none"
+      class="flex items-center justify-between bg-gray-700 px-3 py-2 shrink-0 cursor-move select-none"
       on-pointerdown.stop="onDragStart({ clientX: $event.clientX, clientY: $event.clientY })"
     >
       <!-- content -->
@@ -34,7 +34,7 @@
       </template>
 
       <button
-        class="ml-2 text-zinc-400 hover:text-red-400 transition-colors text-lg leading-none"
+        class="ml-2 text-gray-400 hover:text-red-400 transition-colors text-lg leading-none"
         on-pointerdown.stop=""
         on-click="onDelete()"
       >
@@ -44,7 +44,7 @@
     <div class="flex-1 overflow-hidden">
       <!-- content -->
       <template if="!applet.appletId"></template>
-      <div class="h-full overflow-auto p-3 bg-zinc-900/50">
+      <div class="h-full overflow-auto p-3 bg-gray-900">
         <div class="grid grid-cols-4 gap-2">
           <template for="app of APPLETS">
             <button
