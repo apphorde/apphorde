@@ -29,7 +29,7 @@
       <div class="h-screen w-screen overflow-hidden bg-gray-900 select-none">
         <ws-toolbar></ws-toolbar>
 
-        <ws-canvas on-move="onMove($event)"></ws-canvas>
+        <ws-canvas on-down="onDown()" on-move="onMove($event)" on-draw="onDraw($event)"></ws-canvas>
 
         <div ref="appletsContainer" style="z-index: 2">
           <template for="applet of applets">

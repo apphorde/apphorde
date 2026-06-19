@@ -1,14 +1,15 @@
 <template component="ws-canvas">
-  <script setup>
-    import { ref, computed, defineEvent } from '@li3/web';
-    import useStore, { storeToRefs } from '@app/store.mjs';
+  <script setup lang="ts">
+    import { ref, computed, defineEvent } from "@li3/web";
+    import useStore, { storeToRefs } from "@app/store.mjs";
 
     export default function () {
       const store = useStore();
       const { panX, panY, zoom } = storeToRefs(store);
-      const onDown = defineEvent('down');
-      const onUp = defineEvent('up');
-      const onMove = defineEvent('move');
+      const onDown = defineEvent("down");
+      const onUp = defineEvent("up");
+      const onMove = defineEvent("move");
+      const onDraw = defineEvent("draw");
       const zoomSize = computed(() => zoom.value * 20);
       const isDrawing = ref(false);
       const drawStartX = ref(0);
@@ -28,7 +29,7 @@
       });
 
       function onPointerDown(e) {
-        if (!e.target.classList.contains('canvas')) return;
+        if (!e.target.classList.contains("canvas")) return;
 
         if (e.button === 1 || e.ctrlKey || e.metaKey) {
           isPanning.value = true;
@@ -56,7 +57,7 @@
           panY.value = e.clientY - panStartY.value;
           return;
         }
-       
+
         if (isDrawing.value) {
           const pos = store.screenToCanvas(e.clientX, e.clientY);
           drawCurrentX.value = pos.x;
@@ -73,16 +74,12 @@
           const height = Math.abs(drawCurrentY.value - drawStartY.value);
 
           if (width >= 100 && height >= 100) {
-            const newApplet = {
-              id: `applet-${Date.now()}`,
+            onDraw({
               x: Math.min(drawStartX.value, drawCurrentX.value),
               y: Math.min(drawStartY.value, drawCurrentY.value),
               width,
-              height,
-              appletId: "",
-              loaded: false,
-              zIndex: nextZIndex.value,
-            };
+              height
+            });
             applets.value = [...applets.value, newApplet];
             return;
           }
@@ -97,7 +94,7 @@
       function onWheel(e) {
         const delta = e.deltaY > 0 ? 0.09 : 1.01;
         const prevZoom = zoom.value;
-        const newZoom = Math.min(Math.max(prevZoom * delta, 0.10), 5);
+        const newZoom = Math.min(Math.max(prevZoom * delta, 0.1), 5);
 
         const rect = canvas.value.getBoundingClientRect();
         const mouseX = e.clientX - rect.left;
@@ -127,14 +124,12 @@
         onPointerMove,
         onPointerUp,
         onWheel,
-      }
+      };
     }
   </script>
   <style>
     .canvas {
-      background-image: radial-gradient(circle,
-          #8f8fa5 1px,
-          transparent 1px);
+      background-image: radial-gradient(circle, #8f8fa5 1px, transparent 1px);
       background-size: 20px 20px;
       background-position: 0px 0px;
     }
@@ -144,25 +139,40 @@
     }
   </style>
 
-  <div ref="canvas" class="h-full w-full cursor-crosshair canvas" bind-style="{
+  <div
+    ref="canvas"
+    class="h-full w-full cursor-crosshair canvas"
+    bind-style="{
       'background-size': `${zoomSize}px ${zoomSize}px`,
       'background-position': `${panX}px ${panY}px`
-    }" on-pointerdown="onPointerDown($event)" on-pointermove="onPointerMove($event)" on-pointerup="onPointerUp($event)"
-    on-wheel.prevent.stop="onWheel($event)">
+    }"
+    on-pointerdown="onPointerDown($event)"
+    on-pointermove="onPointerMove($event)"
+    on-pointerup="onPointerUp($event)"
+    on-wheel.prevent.stop="onWheel($event)"
+  >
     <!-- Transform container -->
-    <div class="transform-origin" style-transform="`translate(${panX}px, ${panY}px) scale(${zoom})`">
+    <div
+      class="transform-origin"
+      style-transform="`translate(${panX}px, ${panY}px) scale(${zoom})`"
+    >
       <!-- Drawing preview -->
-      <div class="absolute border-2 border-dashed border-blue-500 bg-blue-500/20 rounded-lg pointer-events-none"
-        class-hidden="!isDrawing" bind-style="{
+      <div
+        class="absolute border-2 border-dashed border-blue-500 bg-blue-500/20 rounded-lg pointer-events-none"
+        class-hidden="!isDrawing"
+        bind-style="{
           left: `${drawPreviewCoords.x}px`,
           top: `${drawPreviewCoords.y}px`,
           width: `${drawPreviewCoords.width}px`,
           height: `${drawPreviewCoords.height}px`,
-        }">
+        }"
+      >
         <span
-          class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-blue-300 text-sm whitespace-nowrap">{{
-          Math.round(drawPreviewCoords.width) }} x
-          {{Math.round(drawPreviewCoords.height)}}</span>
+          class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-blue-300 text-sm whitespace-nowrap"
+        >
+          {{Math.round(drawPreviewCoords.width)}} x
+          {{Math.round(drawPreviewCoords.height)}}</span
+        >
       </div>
     </div>
   </div>
