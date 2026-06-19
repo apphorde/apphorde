@@ -1,5 +1,5 @@
 import { ref, computed, watch, loadCss } from "@li3/web";
-import { useStore } from '/store.mjs';
+import { useStore } from '@app/store.mjs';
 
 export default function () {
   const { panX, panY, zoom, resetView } = useStore();
