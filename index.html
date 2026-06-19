@@ -28,7 +28,7 @@
       <script setup src="/app.mjs"></script>
       <div class="h-screen w-screen overflow-hidden bg-gray-900 select-none">
         <ws-toolbar></ws-toolbar>
-        
+
         <ws-canvas></ws-canvas>
 
         <div ref="appletsContainer" style="z-index: 2">
@@ -41,6 +41,16 @@
               on-drag="onDragStart(applet, $event.detail)"
               on-select="onSelect(applet, $event.detail)"
               on-delete="onDelete(applet)"
+              style-zIndex="`${applet.zIndex || 1}`"
+              bind-style="{
+                left: `${applet.x}px`,
+                top: `${applet.y}px`,
+                width: `${applet.width}px`,
+                height: `${applet.height}px`,
+                zIndex: `${applet.zIndex || 1}`
+              }"
+              class="absolute"
+              class-ring-2.ring-blue-500="draggingApplet === applet.id || resizingApplet === applet.id"
             ></ws-applet>
           </template>
         </div>
