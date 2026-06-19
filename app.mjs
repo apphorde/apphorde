@@ -1,6 +1,8 @@
 import { ref, computed, watch, loadCss } from "@li3/web";
+import { useStore } from '@app/store.mjs';
 
 export default function () {
+  const { panX, panY, zoom, resetView } = useStore();
   loadCss(
     "https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css",
   );
@@ -80,12 +82,6 @@ export default function () {
     applets.value = applets.value.filter((a) => a.id !== applet.id);
   }
 
-  function resetView() {
-    panX.value = 0;
-    panY.value = 0;
-    zoom.value = 1;
-  }
-
   function showAllApplets() {
     const list = applets.value;
     if (list.length === 0) return;
@@ -158,8 +154,11 @@ export default function () {
     }
   }
 
+  function onResetView() {
+    store.resetView();
+  }
+
   return {
-    resetView,
     showAllApplets,
     tileApplets,
     clearAll,
@@ -167,6 +166,7 @@ export default function () {
     onResizeStart,
     onDelete,
     onSelect,
+    onResetView,
     applets,
     draggingApplet,
     resizingApplet,
