@@ -18,18 +18,17 @@
       <template if="!applet.appletId">
         <span class="text-sm text-white truncate pointer-events-none">
           Select an Applet
-        </span></template
-      >
-      <template if="!applet.appletId">
+        </span>
+      </template>
+      <template if="applet.appletId">
         <span class="text-sm text-white truncate pointer-events-none">
-          {{applet.icon}} {{applet.name}}
+          {{applet.app.icon}} {{applet.app.name}}
         </span>
       </template>
 
       <button
         class="ml-2 text-gray-400 hover:text-red-400 transition-colors text-lg leading-none"
-        on-pointerdown.stop=""
-        on-click="onDelete()"
+        on-click.stop="onDelete()"
       >
         &times;
       </button>
@@ -58,7 +57,7 @@
       <template if="applet.appletId">
         <iframe
           class="w-full h-full border-0"
-          bind-src="applet.url"
+          bind-src="applet.app.url"
           bind-title="applet.name"
           sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
         ></iframe>

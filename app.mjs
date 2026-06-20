@@ -1,5 +1,5 @@
 import { ref, computed, watch, loadCss } from "@li3/web";
-import useStore, { storeToRefs } from "@app/store.mjs";
+import useStore, { storeToRefs } from "./store.mjs";
 
 export default function () {
   const store = useStore();
