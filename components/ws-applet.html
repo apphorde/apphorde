@@ -15,12 +15,12 @@
       on-pointerup.stop="onDragStop()"
     >
       <!-- content -->
-      <template if="!applet.appletId">
+      <template if="!applet.app">
         <span class="text-sm text-white truncate pointer-events-none">
           Select an Applet
         </span>
       </template>
-      <template if="applet.appletId">
+      <template if="applet.app">
         <span class="text-sm text-white truncate pointer-events-none">
           {{applet.app.icon}} {{applet.app.name}}
         </span>
@@ -35,26 +35,28 @@
     </div>
     <div class="flex-1 overflow-hidden">
       <!-- content -->
-      <template if="!applet.appletId"></template>
-      <div class="h-full overflow-auto p-3 bg-gray-900">
-        <div class="grid grid-cols-4 gap-2">
-          <template for="app of APPLETS">
-            <button
-              class="flex flex-col items-center gap-1.5 p-2 rounded-lg hover:bg-zinc-700/50 transition-colors group"
-              on-click="onSelect(app)"
-            >
-              <span class="text-2xl group-hover:scale-110 transition-transform"
-                >{{app.icon}}</span
+      <template if="!applet.app">
+        <div class="h-full overflow-auto p-3 bg-gray-900">
+          <div class="grid grid-cols-4 gap-2">
+            <template for="app of APPLETS">
+              <button
+                class="flex flex-col items-center gap-1.5 p-2 rounded-lg hover:bg-zinc-700/50 transition-colors group"
+                on-click="onSelect(app)"
               >
-              <span
-                class="text-xs text-zinc-300 text-center leading-tight truncate w-full"
-                >{{app.name}}</span
-              >
-            </button>
-          </template>
+                <span
+                  class="text-2xl group-hover:scale-110 transition-transform"
+                  >{{app.icon}}</span
+                >
+                <span
+                  class="text-xs text-zinc-300 text-center leading-tight truncate w-full"
+                  >{{app.name}}</span
+                >
+              </button>
+            </template>
+          </div>
         </div>
-      </div>
-      <template if="applet.appletId">
+      </template>
+      <template if="applet.app">
         <iframe
           class="w-full h-full border-0"
           bind-src="applet.app.url"
@@ -90,7 +92,7 @@
         id: "notes",
         name: "Notes",
         icon: "📝",
-        url: "https://www.rapidtables.com/tools/notepad.html",
+        url: "https://notes.apphor.de",
       },
       {
         id: "maps",
@@ -111,10 +113,10 @@
         url: "https://translate.google.com/",
       },
       {
-        id: "timer",
+        id: "pomodoro",
         name: "Timer",
-        icon: "⏱️",
-        url: "https://www.online-stopwatch.com/",
+        icon: "🍅",
+        url: "https://pomodoro.apphor.de",
       },
     ];
 

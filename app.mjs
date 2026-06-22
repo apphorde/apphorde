@@ -1,5 +1,5 @@
 import { ref, computed, watch, loadCss } from "@li3/web";
-import useStore, { storeToRefs } from "./store.mjs";
+import useStore, { storeToRefs } from "@app/store.mjs";
 
 export default function () {
   const store = useStore();
@@ -36,8 +36,8 @@ export default function () {
   });
 
   function onUp() {
-    draggingApplet.value = '';
-    resizingApplet.value = '';
+    draggingApplet.value = "";
+    resizingApplet.value = "";
   }
 
   function onDraw($event) {
@@ -48,8 +48,6 @@ export default function () {
       y,
       width,
       height,
-      appletId: "",
-      loaded: false,
       zIndex: nextZIndex.value,
     };
     applets.value = [...applets.value, newApplet];
@@ -148,7 +146,7 @@ export default function () {
   }
 
   function onSelect(applet, app) {
-    updateApplet(applet.id, { appletId: app.id, loaded: true, app });
+    updateApplet(applet.id, { app });
   }
 
   function onDelete(applet) {
@@ -157,6 +155,7 @@ export default function () {
 
   function showAllApplets() {
     const list = applets.value;
+
     if (list.length === 0) return;
 
     let minX = Infinity,
